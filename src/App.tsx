@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Star, BookOpen, Trophy, Bell, AlertTriangle, Calendar, DollarSign, Users, CheckCircle, Clock, Mail, Smartphone, TrendingUp, Eye, Download, UserCheck, AlertCircle, Target, BarChart3, Shield, Zap, FileText, Settings, Award } from 'lucide-react';
 
 const UnifiedLearningPlatform = () => {
-    // Ensuring all potentially accessed properties are present in the base user state
     const [user] = useState({
         name: "Sarah Martinez",
         role: "Sales Manager",
@@ -12,22 +11,22 @@ const UnifiedLearningPlatform = () => {
         currentMonth: "July 2025",
         salesCloseDate: "July 31, 2025, 11:59 PM PT",
         daysRemaining: 3,
-        newCarsSold: 0, // Default for manager overview
-        completedModules: 0, // Default for manager overview
-        totalModules: 0, // Default for manager overview
-        complianceScore: 100, // Default for manager overview
-        lastActivity: 'N/A', // Default for manager overview
-        hireDate: 'N/A', // Default for manager overview
-        email: 'sarah.martinez@metrohyundai.com', // Example email
-        phone: '(555) 000-0000', // Example phone
-        manager: 'N/A', // Managers typically don't have a direct manager in this context
-        territory: 'All Regions', // Default for manager overview
-        ytdSales: 0, // Default for manager overview
-        avgCustomerRating: 0, // Default for manager overview
-        certifications: [], // Default for manager overview
-        trainingModules: [], // Default for manager overview
-        recentNudges: [], // Default for manager overview
-        engagement: { // Default engagement metrics for manager overview
+        newCarsSold: 0,
+        completedModules: 0,
+        totalModules: 0,
+        complianceScore: 100,
+        lastActivity: 'N/A',
+        hireDate: 'N/A',
+        email: 'sarah.martinez@metrohyundai.com',
+        phone: '(555) 000-0000',
+        manager: 'N/A',
+        territory: 'All Regions',
+        ytdSales: 0,
+        avgCustomerRating: 0,
+        certifications: [],
+        trainingModules: [],
+        recentNudges: [],
+        engagement: {
             nudgeOpenRate: 0,
             trainingCompletionRate: 0,
             lastLogin: 'N/A'
@@ -203,7 +202,6 @@ const UnifiedLearningPlatform = () => {
         }
     ]);
 
-    // Calculate STAR rewards
     const getStarReward = (carsSold) => {
         if (carsSold >= 17) return { rate: 175, total: carsSold * 175 };
         if (carsSold >= 11) return { rate: 125, total: carsSold * 125 };
@@ -213,8 +211,6 @@ const UnifiedLearningPlatform = () => {
 
     const getCurrentUser = () => {
         if (viewMode === 'overview') {
-            // When in overview mode, currentUser is the manager.
-            // Ensure all properties expected in individual view are present, even if with default values.
             return {
                 ...user,
                 newCarsSold: user.newCarsSold,
@@ -240,14 +236,12 @@ const UnifiedLearningPlatform = () => {
         const completed = currentTrainingModulesForSelected.filter(m => m.status === 'completed').length;
         const total = currentTrainingModulesForSelected.length;
 
-        // Ensure all properties are consistently available when returning a team member
         return {
-            ...user, // Start with user base properties
-            ...(member || {}), // Override with member properties if found
+            ...user,
+            ...(member || {}),
             completedModules: completed,
             totalModules: total,
             starQualified: completed === total && (member ? member.newCarsSold : 0) >= 6,
-            // Ensure these properties always exist, even if the member object doesn't have them
             certifications: member?.certifications || [],
             trainingModules: member?.trainingModules || [],
             recentNudges: member?.recentNudges || [],
@@ -286,7 +280,7 @@ const UnifiedLearningPlatform = () => {
 
                             if (newStatus === 'in_progress') {
                                 updatedModule.progress = newProgress;
-                                if (!updatedModule.dueDate && module.dueDate) { // Keep original dueDate if exists
+                                if (!updatedModule.dueDate && module.dueDate) {
                                     updatedModule.dueDate = module.dueDate;
                                 }
                                 delete updatedModule.completedDate;
@@ -297,7 +291,7 @@ const UnifiedLearningPlatform = () => {
                                 delete updatedModule.progress;
                                 delete updatedModule.dueDate;
                             } else if (newStatus === 'not_started') {
-                                if (!updatedModule.dueDate && module.dueDate) { // Keep original dueDate if exists
+                                if (!updatedModule.dueDate && module.dueDate) {
                                      updatedModule.dueDate = module.dueDate;
                                 }
                                 delete updatedModule.progress;
@@ -597,7 +591,7 @@ ${complianceAlerts.map(alert => `
                         </div>
                     )}
                 </div>
-            )}
+            </div>
 
             {/* Navigation */}
             {viewMode === 'overview' && (
@@ -1126,7 +1120,7 @@ ${complianceAlerts.map(alert => `
                                         </div>
                                     ))
                                 ) : (
-                                    <p className="text-gray-500">No recent nudges for this employee.</p>
+                                    <p className="text-gray-500 text-sm">No recent nudges for this employee.</p>
                                 )}
                             </div>
                         </div>
