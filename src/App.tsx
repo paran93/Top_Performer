@@ -1,477 +1,1017 @@
-import React, { useState, useEffect } from 'react';
-import { Calendar, MapPin, Clock, Users, Bell, CheckCircle, AlertCircle, Search, Filter, Star } from 'lucide-react';
+import React, { useState } from 'react';
+import { CheckCircle, XCircle, Clock, Eye, FileText, Users, AlertTriangle, Brain, BookOpen, Flag, Target, Layers, Database, GraduationCap, TrendingUp, Compass, RefreshCcw, Lightbulb } from 'lucide-react';
 
-const TrainingRegistrationSystem = () => {
-  const [selectedClass, setSelectedClass] = useState(null);
-  const [registrationStep, setRegistrationStep] = useState('browse');
-  const [userLocation, setUserLocation] = useState('Downtown Training Center');
-  const [notifications, setNotifications] = useState([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterCategory, setFilterCategory] = useState('all');
+const AILearningApprovalWorkflow = () => {
+  const [activeTab, setActiveTab] = useState('dashboard');
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [newPrompt, setNewPrompt] = useState('');
+  const [contentType, setContentType] = useState('lesson');
+  const [targetAudience, setTargetAudience] = useState('general');
+  const [rejectionComments, setRejectionComments] = useState('');
 
-  // Mock data for training classes
-  const trainingClasses = [
+  const [contentItems, setContentItems] = useState([
     {
       id: 1,
-      title: 'Advanced Diagnostic Systems',
-      category: 'Technical',
-      location: 'Downtown Training Center',
-      distance: '2.1 miles',
-      date: '2025-07-25',
-      time: '9:00 AM - 12:00 PM',
-      instructor: 'Mike Chen',
-      capacity: 15,
-      enrolled: 15,
-      waitlist: 3,
-      status: 'full',
-      topics: ['Engine Diagnostics', 'Electronic Systems', 'Troubleshooting']
+      title: "OEM Dealership Sales Onboarding: Product Knowledge",
+      type: "lesson",
+      status: "sme-review",
+      aiGenerated: true,
+      aiModel: "GPT-4",
+      modelVersion: "4.0.3",
+      prompt: "Develop an interactive module for new dealership sales staff on key OEM vehicle features, trim levels, and competitive advantages.",
+      confidenceScore: 0.94,
+      generatedAt: "2025-01-20 09:30",
+      submittedBy: "AI Content Generator",
+      currentReviewer: "Regional Sales Trainer",
+      riskLevel: "medium",
+      targetAudience: "new-hires", // Maps to 'new-hires' in learningProgramsMap
+      contentPreview: "Welcome to your OEM Sales Journey! This module will equip you with essential product knowledge to confidently present our vehicles...",
+      flags: ["product-info", "sales-training"],
+      currentStage: 2,
+      totalStages: 6,
+      workflowPath: [
+        { stage: "AI Generation", status: "completed", reviewer: "AI System", completedAt: "2025-01-20 09:30" },
+        { stage: "Risk Analysis", status: "completed", reviewer: "Risk Scanner", completedAt: "2025-01-20 09:32" },
+        { stage: "SME Review", status: "in-progress", reviewer: "Regional Sales Trainer", assignedAt: "2025-01-20 09:34" },
+        { stage: "Legal Review", status: "pending", reviewer: "Legal Team", assignedAt: null },
+        { stage: "DEI Review", status: "pending", reviewer: "DEI Officer", assignedAt: null },
+        { stage: "Final Approval", status: "pending", reviewer: "Learning Director", assignedAt: null }
+      ],
+      rejectionHistory: [],
+      xapiEvents: [
+        { verb: "generated", timestamp: "2025-01-20 09:30", actor: "AI System" },
+        { verb: "documented", timestamp: "2025-01-20 09:31", actor: "Metadata Registry" },
+        { verb: "analyzed", timestamp: "2025-01-20 09:32", actor: "Risk Scanner" },
+        { verb: "submitted", timestamp: "2025-01-20 09:33", actor: "System" },
+        { verb: "assigned", timestamp: "2025-01-20 09:34", actor: "Workflow Engine" }
+      ]
     },
     {
       id: 2,
-      title: 'Customer Service Excellence',
-      category: 'Service',
-      location: 'Westside Training Hub',
-      distance: '5.8 miles',
-      date: '2025-07-26',
-      time: '1:00 PM - 4:00 PM',
-      instructor: 'Sarah Johnson',
-      capacity: 20,
-      enrolled: 12,
-      status: 'available',
-      topics: ['Communication Skills', 'Conflict Resolution', 'Sales Techniques']
+      title: "Advanced CRM Training for Corporate Sales",
+      type: "interactive",
+      status: "dei-review",
+      aiGenerated: true,
+      aiModel: "Claude Sonnet",
+      modelVersion: "3.5",
+      prompt: "Create an advanced training module for OEM corporate sales teams on leveraging CRM analytics for lead scoring and pipeline management.",
+      confidenceScore: 0.87,
+      generatedAt: "2025-01-19 14:15",
+      submittedBy: "AI Content Generator",
+      currentReviewer: "Corporate IT Lead",
+      riskLevel: "high",
+      targetAudience: "managers", // Maps to 'managers' in learningProgramsMap
+      contentPreview: "Master our CRM to supercharge your sales pipeline. This training focuses on data-driven lead qualification and efficient opportunity management...",
+      flags: ["crm-training", "data-analytics"],
+      currentStage: 4,
+      totalStages: 6,
+      workflowPath: [
+        { stage: "AI Generation", status: "completed", reviewer: "AI System", completedAt: "2025-01-19 14:15" },
+        { stage: "Risk Analysis", status: "completed", reviewer: "Risk Scanner", completedAt: "2025-01-19 14:17" },
+        { stage: "SME Review", status: "completed", reviewer: "Sales Operations SME", completedAt: "2025-01-19 15:45" },
+        { stage: "Legal Review", status: "completed", reviewer: "Corporate Legal", completedAt: "2025-01-19 16:22" },
+        { stage: "DEI Review", status: "in-progress", reviewer: "Corporate IT Lead", assignedAt: "2025-01-19 16:25" },
+        { stage: "Final Approval", status: "pending", reviewer: "Learning Director", assignedAt: null }
+      ],
+      rejectionHistory: [],
+      xapiEvents: [
+        { verb: "generated", timestamp: "2025-01-19 14:15", actor: "AI System" },
+        { verb: "reviewed", timestamp: "2025-01-19 15:22", actor: "Sales Operations SME" },
+        { verb: "approved", timestamp: "2025-01-19 15:45", actor: "Sales Operations SME" },
+        { verb: "approved", timestamp: "2025-01-19 16:22", actor: "Corporate Legal" },
+        { verb: "assigned", timestamp: "2025-01-19 16:25", actor: "Workflow Engine" }
+      ]
     },
     {
       id: 3,
-      title: 'Hybrid Vehicle Maintenance',
-      category: 'Technical',
-      location: 'Downtown Training Center',
-      distance: '2.1 miles',
-      date: '2025-07-28',
-      time: '10:00 AM - 1:00 PM',
-      instructor: 'Alex Rivera',
-      capacity: 12,
-      enrolled: 8,
-      status: 'available',
-      topics: ['Battery Systems', 'Electric Motors', 'Safety Protocols']
+      title: "Dealership Service Bay Safety Protocol Quiz",
+      type: "assessment",
+      status: "published",
+      aiGenerated: true,
+      aiModel: "Gemini Pro",
+      modelVersion: "1.5",
+      prompt: "Design a mandatory quiz for dealership service technicians covering safety protocols for high-voltage vehicles and workshop equipment.",
+      confidenceScore: 0.96,
+      generatedAt: "2025-01-18 11:45",
+      submittedBy: "AI Content Generator",
+      currentReviewer: "Published",
+      riskLevel: "low",
+      targetAudience: "all-employees", // Maps to 'all-employees' in learningProgramsMap
+      contentPreview: "Test your knowledge on essential service bay safety. This quiz covers critical procedures for electric vehicle handling, lift operations, and hazardous waste disposal...",
+      flags: ["assessment", "safety-training"],
+      approvedBy: "Full Review Chain",
+      publishedAt: "2025-01-18 16:30",
+      learnerViews: 247,
+      currentStage: 6,
+      totalStages: 6,
+      workflowPath: [
+        { stage: "AI Generation", status: "completed", reviewer: "AI System", completedAt: "2025-01-18 11:45" },
+        { stage: "Risk Analysis", status: "completed", reviewer: "Risk Scanner", completedAt: "2025-01-18 11:47" },
+        { stage: "SME Review", status: "completed", reviewer: "Dealership Safety Officer", completedAt: "2025-01-18 13:22" },
+        { stage: "Legal Review", status: "completed", reviewer: "OEM Legal Dept.", completedAt: "2025-01-18 14:15" },
+        { stage: "DEI Review", status: "skipped", reviewer: "N/A (Low Risk)", completedAt: "2025-01-18 14:15" },
+        { stage: "Final Approval", status: "completed", reviewer: "OEM Learning Director", completedAt: "2025-01-18 16:30" }
+      ],
+      rejectionHistory: [],
+      xapiEvents: [
+        { verb: "generated", timestamp: "2025-01-18 11:45", actor: "AI System" },
+        { verb: "reviewed", timestamp: "2025-01-18 13:22", actor: "Dealership Safety Officer" },
+        { verb: "approved", timestamp: "2025-01-18 14:15", actor: "OEM Legal Dept." },
+        { verb: "published", timestamp: "2025-01-18 16:30", actor: "LMS System" },
+        { verb: "experienced", timestamp: "2025-01-18 17:45", actor: "247 Dealership Learners" }
+      ]
     },
-    {
-      id: 4,
-      title: 'Digital Marketing for Dealers',
-      category: 'Business',
-      location: 'North Campus',
-      distance: '12.3 miles',
-      date: '2025-07-30',
-      time: '9:00 AM - 5:00 PM',
-      instructor: 'Jessica Park',
-      capacity: 25,
-      enrolled: 18,
-      status: 'available',
-      topics: ['Social Media', 'Online Advertising', 'Analytics']
-    }
-  ];
+  ]);
 
-  // AI-suggested alternatives when a class is full
-  const generateAlternatives = (fullClass) => {
-    const alternatives = trainingClasses
-      .filter(cls => cls.id !== fullClass.id && cls.status === 'available')
-      .map(cls => {
-        let score = 0;
-        let reasons = [];
-
-        // Proximity scoring
-        if (cls.location === fullClass.location) {
-          score += 30;
-          reasons.push(`Same location (${cls.location})`);
-        } else if (parseFloat(cls.distance) < 5) {
-          score += 20;
-          reasons.push(`Nearby location (${cls.distance})`);
-        }
-
-        // Topic relevance scoring
-        const commonTopics = cls.topics.filter(topic => 
-          fullClass.topics.some(ft => ft.toLowerCase().includes(topic.toLowerCase()) || 
-                                     topic.toLowerCase().includes(ft.toLowerCase()))
-        );
-        if (commonTopics.length > 0) {
-          score += commonTopics.length * 15;
-          reasons.push(`Related topics: ${commonTopics.join(', ')}`);
-        }
-
-        // Category match
-        if (cls.category === fullClass.category) {
-          score += 25;
-          reasons.push(`Same category (${cls.category})`);
-        }
-
-        // Availability bonus (earlier dates get higher scores)
-        const daysDiff = Math.abs(new Date(cls.date) - new Date(fullClass.date)) / (1000 * 60 * 60 * 24);
-        if (daysDiff <= 7) {
-          score += 10;
-          reasons.push(`Similar timing (${daysDiff} days difference)`);
-        }
-
-        return { ...cls, aiScore: score, matchReasons: reasons };
-      })
-      .sort((a, b) => b.aiScore - a.aiScore)
-      .slice(0, 3);
-
-    return alternatives;
-  };
-
-  const handleRegistration = (classInfo) => {
-    if (classInfo.status === 'full') {
-      setSelectedClass(classInfo);
-      setRegistrationStep('alternatives');
-    } else {
-      setSelectedClass(classInfo);
-      setRegistrationStep('confirm');
-    }
-  };
-
-  const confirmRegistration = () => {
-    setRegistrationStep('success');
-    const newNotification = {
-      id: Date.now(),
-      type: 'success',
-      message: `Successfully registered for "${selectedClass.title}"`
+  const getStatusColor = (status) => {
+    const colors = {
+      'ai-generation': 'text-blue-600 bg-blue-100',
+      'risk-analysis': 'text-purple-600 bg-purple-100',
+      'sme-review': 'text-yellow-600 bg-yellow-100',
+      'legal-review': 'text-orange-600 bg-orange-100',
+      'dei-review': 'text-indigo-600 bg-indigo-100',
+      'lxd-review': 'text-teal-600 bg-teal-100',
+      'final-approval': 'text-green-600 bg-green-100',
+      'published': 'text-green-700 bg-green-200',
+      'rejected': 'text-red-600 bg-red-100'
     };
-    setNotifications([...notifications, newNotification]);
-
-    // Simulate instructor notification
-    setTimeout(() => {
-      const instructorNotification = {
-        id: Date.now() + 1,
-        type: 'info',
-        message: `Instructor ${selectedClass.instructor} has been notified of your registration`
-      };
-      setNotifications(prev => [...prev, instructorNotification]);
-    }, 2000);
+    return colors[status] || 'text-gray-600 bg-gray-100';
   };
 
-  const filteredClasses = trainingClasses.filter(cls => {
-    const matchesSearch = cls.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         cls.topics.some(topic => topic.toLowerCase().includes(searchTerm.toLowerCase()));
-    const matchesFilter = filterCategory === 'all' || cls.category.toLowerCase() === filterCategory.toLowerCase();
-    return matchesSearch && matchesFilter;
-  });
+  const getRiskColor = (risk) => {
+    const colors = {
+      'low': 'text-green-600 bg-green-100',
+      'medium': 'text-yellow-600 bg-yellow-100',
+      'high': 'text-red-600 bg-red-100'
+    };
+    return colors[risk] || 'text-gray-600 bg-gray-100';
+  };
 
-  if (registrationStep === 'alternatives') {
-    const alternatives = generateAlternatives(selectedClass);
-    
-    return (
-      <div className="max-w-4xl mx-auto p-6 bg-gray-50 min-h-screen">
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <div className="flex items-center mb-6">
-            <AlertCircle className="text-orange-500 mr-3" size={24} />
-            <h2 className="text-2xl font-bold text-gray-800">Class Full - AI Suggestions</h2>
-          </div>
-          
-          <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6">
-            <p className="text-orange-800">
-              <strong>"{selectedClass.title}"</strong> is currently full ({selectedClass.enrolled}/{selectedClass.capacity} enrolled, {selectedClass.waitlist} on waitlist).
-            </p>
-            <p className="text-orange-700 mt-2">Our AI has found these alternative sessions based on proximity, availability, and relevance:</p>
-          </div>
+  const generateAIContent = () => {
+    if (newPrompt.trim()) {
+      const newItem = {
+        id: Date.now(),
+        title: "AI Generated Learning Content",
+        type: contentType,
+        status: "ai-generation",
+        aiGenerated: true,
+        aiModel: "GPT-4",
+        modelVersion: "4.0.3",
+        prompt: newPrompt,
+        confidenceScore: Math.random() * 0.3 + 0.7,
+        generatedAt: new Date().toLocaleString(),
+        submittedBy: "AI Content Generator",
+        currentReviewer: "System Processing",
+        riskLevel: contentType === 'assessment' ? 'low' : targetAudience === 'managers' ? 'high' : 'medium',
+        targetAudience: targetAudience,
+        contentPreview: "AI is generating content based on your prompt...",
+        flags: [],
+        currentStage: 1,
+        totalStages: 6,
+        workflowPath: [
+          { stage: "AI Generation", status: "in-progress", reviewer: "AI System", assignedAt: new Date().toLocaleString() },
+          { stage: "Risk Analysis", status: "pending", reviewer: "Risk Scanner", assignedAt: null },
+          { stage: "SME Review", status: "pending", reviewer: "SME Team", assignedAt: null },
+          { stage: "Legal Review", status: "pending", reviewer: "Legal Team", assignedAt: null },
+          { stage: "DEI Review", status: "pending", reviewer: "DEI Officer", assignedAt: null },
+          { stage: "Final Approval", status: "pending", reviewer: "Learning Director", assignedAt: null }
+        ],
+        rejectionHistory: [],
+        xapiEvents: [
+          { verb: "generated", timestamp: new Date().toLocaleString(), actor: "AI System" }
+        ]
+      };
+      setContentItems(prev => [newItem, ...prev]);
+      setNewPrompt('');
+      
+      // Simulate AI generation process
+      setTimeout(() => {
+        setContentItems(prev => prev.map(item => 
+          item.id === newItem.id 
+            ? { ...item, status: 'risk-analysis', contentPreview: `Generated ${contentType} content based on prompt: "${newPrompt.substring(0, 50)}..."` }
+            : item
+        ));
+      }, 2000);
+    }
+  };
 
-          <div className="space-y-4">
-            {alternatives.map((alt, index) => (
-              <div key={alt.id} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                <div className="flex justify-between items-start mb-3">
-                  <div>
-                    <div className="flex items-center mb-2">
-                      <Star className="text-blue-500 mr-2" size={20} />
-                      <h3 className="text-lg font-semibold text-gray-800">{alt.title}</h3>
-                      <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs ml-2">
-                        AI Match: {alt.aiScore}%
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-2 gap-4 text-sm text-gray-600">
-                      <div className="flex items-center">
-                        <Calendar className="mr-1" size={16} />
-                        {alt.date} at {alt.time}
-                      </div>
-                      <div className="flex items-center">
-                        <MapPin className="mr-1" size={16} />
-                        {alt.location} ({alt.distance})
-                      </div>
-                      <div className="flex items-center">
-                        <Users className="mr-1" size={16} />
-                        {alt.enrolled}/{alt.capacity} enrolled
-                      </div>
-                      <div className="text-green-600 font-medium">Available</div>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => {
-                      setSelectedClass(alt);
-                      setRegistrationStep('confirm');
-                    }}
-                    className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
-                  >
-                    Register
-                  </button>
-                </div>
-                
-                <div className="bg-gray-50 rounded p-3 mt-3">
-                  <p className="text-sm font-medium text-gray-700 mb-1">Why this matches:</p>
-                  <ul className="text-sm text-gray-600 list-disc list-inside">
-                    {alt.matchReasons.map((reason, idx) => (
-                      <li key={idx}>{reason}</li>
-                    ))}
-                  </ul>
-                </div>
-              </div>
-            ))}
-          </div>
+  const handleReviewAction = (itemId, action, comments = '') => {
+    setContentItems(prev => prev.map(item => {
+      if (item.id === itemId) {
+        const timestamp = new Date().toLocaleString();
+        let updatedItem = { ...item };
+        
+        if (action === 'approve') {
+          // Move to next stage in workflow
+          const nextStageIndex = item.workflowPath.findIndex(stage => stage.status === 'in-progress') + 1;
+          const updatedWorkflowPath = item.workflowPath.map((stage, index) => {
+            if (index === nextStageIndex - 1) {
+              return { ...stage, status: 'completed', completedAt: timestamp };
+            }
+            if (index === nextStageIndex && nextStageIndex < item.workflowPath.length) {
+              return { ...stage, status: 'in-progress', assignedAt: timestamp };
+            }
+            return stage;
+          });
 
-          <div className="flex justify-between mt-6">
-            <button
-              onClick={() => setRegistrationStep('browse')}
-              className="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600"
-            >
-              Back to Browse
-            </button>
-            <button
-              onClick={() => {
-                const waitlistNotification = {
-                  id: Date.now(),
-                  type: 'info',
-                  message: `Added to waitlist for "${selectedClass.title}". You'll be notified if a spot opens.`
-                };
-                setNotifications([...notifications, waitlistNotification]);
-                setRegistrationStep('browse');
-              }}
-              className="bg-orange-600 text-white px-6 py-2 rounded-lg hover:bg-orange-700"
-            >
-              Join Original Waitlist
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+          // Determine new status and current reviewer
+          let newStatus = item.status;
+          let newReviewer = item.currentReviewer;
+          let newCurrentStage = item.currentStage;
 
-  if (registrationStep === 'confirm') {
-    return (
-      <div className="max-w-2xl mx-auto p-6 bg-gray-50 min-h-screen">
-        <div className="bg-white rounded-lg shadow-lg p-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6">Confirm Registration</h2>
-          
-          <div className="border border-gray-200 rounded-lg p-4 mb-6">
-            <h3 className="text-lg font-semibold text-gray-800 mb-3">{selectedClass.title}</h3>
-            <div className="grid grid-cols-1 gap-2 text-sm text-gray-600">
-              <div className="flex items-center">
-                <Calendar className="mr-2" size={16} />
-                {selectedClass.date} at {selectedClass.time}
-              </div>
-              <div className="flex items-center">
-                <MapPin className="mr-2" size={16} />
-                {selectedClass.location}
-              </div>
-              <div className="flex items-center">
-                <Users className="mr-2" size={16} />
-                Instructor: {selectedClass.instructor}
-              </div>
-            </div>
-          </div>
+          const statusFlow = {
+            'sme-review': { status: 'legal-review', reviewer: 'Legal Team', stage: 3 },
+            'legal-review': { status: 'dei-review', reviewer: 'DEI Officer', stage: 4 },
+            'dei-review': { status: 'final-approval', reviewer: 'Learning Director', stage: 5 },
+            'final-approval': { status: 'published', reviewer: 'Published', stage: 6 }
+          };
 
-          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-            <h4 className="font-medium text-blue-800 mb-2">Automatic Features Enabled:</h4>
-            <ul className="text-sm text-blue-700 space-y-1">
-              <li>✓ Email confirmation will be sent immediately</li>
-              <li>✓ Calendar reminder 24 hours before class</li>
-              <li>✓ SMS reminder 2 hours before class</li>
-              <li>✓ Instructor will receive updated roster automatically</li>
-              <li>✓ Real-time updates if class details change</li>
-            </ul>
-          </div>
+          const next = statusFlow[item.status];
+          if (next) {
+            newStatus = next.status;
+            newReviewer = next.reviewer;
+            newCurrentStage = next.stage;
+          }
 
-          <div className="flex justify-between">
-            <button
-              onClick={() => setRegistrationStep('browse')}
-              className="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={confirmRegistration}
-              className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700"
-            >
-              Confirm Registration
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
+          updatedItem = {
+            ...updatedItem,
+            status: newStatus,
+            currentReviewer: newReviewer,
+            currentStage: newCurrentStage,
+            workflowPath: updatedWorkflowPath
+          };
 
-  if (registrationStep === 'success') {
-    return (
-      <div className="max-w-2xl mx-auto p-6 bg-gray-50 min-h-screen">
-        <div className="bg-white rounded-lg shadow-lg p-6 text-center">
-          <CheckCircle className="text-green-500 mx-auto mb-4" size={64} />
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">Registration Successful!</h2>
-          <p className="text-gray-600 mb-6">
-            You're now registered for <strong>"{selectedClass.title}"</strong>
-          </p>
-          
-          <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-            <h4 className="font-medium text-green-800 mb-2">What happens next:</h4>
-            <ul className="text-sm text-green-700 text-left space-y-1">
-              <li>✓ Confirmation email sent to your inbox</li>
-              <li>✓ Event added to your calendar</li>
-              <li>✓ Instructor notified of new registration</li>
-              <li>✓ Automated reminders scheduled</li>
-            </ul>
-          </div>
+        } else if (action === 'reject') {
+          // Create rejection entry
+          const currentStageInfo = item.workflowPath.find(stage => stage.status === 'in-progress');
+          const rejectionEntry = {
+            stage: currentStageInfo?.stage || 'Unknown Stage',
+            reviewer: 'Current User',
+            rejectedAt: timestamp,
+            reason: comments,
+            feedback: [], // This could be expanded to parse structured feedback
+            severity: 'major' // This could be determined by the reviewer
+          };
 
-          <button
-            onClick={() => setRegistrationStep('browse')}
-            className="bg-blue-600 text-white px-8 py-2 rounded-lg hover:bg-blue-700"
-          >
-            Browse More Classes
-          </button>
-        </div>
-      </div>
-    );
-  }
+          // Update workflow path to show rejection
+          const updatedWorkflowPath = item.workflowPath.map(stage => {
+            if (stage.status === 'in-progress') {
+              return { ...stage, status: 'rejected', completedAt: timestamp };
+            }
+            if (stage.status === 'pending') {
+              return { ...stage, status: 'cancelled' };
+            }
+            return stage;
+          });
+
+          updatedItem = {
+            ...updatedItem,
+            status: 'rejected',
+            currentReviewer: `Rejected at ${currentStageInfo?.stage || 'Current Stage'}`,
+            workflowPath: updatedWorkflowPath,
+            rejectionHistory: [...(item.rejectionHistory || []), rejectionEntry]
+          };
+        }
+
+        const newEvent = { 
+          verb: action === 'approve' ? 'approved' : 'rejected', 
+          timestamp, 
+          actor: 'Current User',
+          comments: comments || undefined
+        };
+
+        return {
+          ...updatedItem,
+          xapiEvents: [...updatedItem.xapiEvents, newEvent]
+        };
+      }
+      return item;
+    }));
+    setSelectedItem(null);
+    setRejectionComments(''); // Clear comments after action
+  };
+
+  const stats = {
+    total: contentItems.length,
+    inReview: contentItems.filter(item => !['published', 'rejected'].includes(item.status)).length,
+    published: contentItems.filter(item => item.status === 'published').length,
+    highRisk: contentItems.filter(item => item.riskLevel === 'high').length
+  };
+
+  // Mapping target audiences to their respective learning programs and AI features
+  const learningProgramsMap = {
+    "technical": {
+      title: "For Technical/Service Staff",
+      icon: <GraduationCap className="w-5 h-5 text-blue-600" />,
+      modules: [
+        "AR/VR-Based Machine Repair Simulations",
+        "Troubleshooting Smart Manufacturing Systems",
+        "Sensor Diagnostics and Predictive Maintenance",
+        "Robotics Programming Basics"
+      ],
+      aiFeatures: [
+        "Interactive fault-tree simulators",
+        "Smart hint system during simulations"
+      ]
+    },
+    "salesperson": {
+      title: "For Frontline Salesperson",
+      icon: <Users className="w-5 h-5 text-green-600" />,
+      modules: [
+        "Mobile Learning for Product Specs & Demos",
+        "Objection Handling for Competitive OEM Markets",
+        "AI-Assisted Quote Configurators"
+      ],
+      aiFeatures: [
+        "Chat-based roleplays for objection handling",
+        "Personalized pitch builders using AI"
+      ]
+    },
+    "l&d-designers": {
+      title: "For L&D / Designers",
+      icon: <Lightbulb className="w-5 h-5 text-purple-600" />,
+      modules: [
+        "Persona-Based Curriculum Templates",
+        "AI Content Co-Creation for Learning Modules",
+        "Best Practices for AI-Augmented Learning Design"
+      ],
+      aiFeatures: [
+        "Lesson auto-generator",
+        "Feedback loop from learner data"
+      ]
+    },
+    "managers": {
+      title: "For Performance Managers",
+      icon: <TrendingUp className="w-5 h-5 text-orange-600" />,
+      modules: [
+        "Using Compliance Dashboards",
+        "Diagnosing Underperformance via Learning Metrics",
+        "Coaching Conversations Based on AI Insights"
+      ],
+      aiFeatures: [
+        "Predictive analytics for team performance",
+        "Alerts on learner disengagement"
+      ]
+    },
+    "compliance-officers": {
+      title: "For Compliance Officers",
+      icon: <Flag className="w-5 h-5 text-red-600" />,
+      modules: [
+        "Mandatory Training (ISO, Safety, ESG)",
+        "Audit-Ready Learning Log Reviews",
+        "Regulatory Changes in OEM Compliance"
+      ],
+      aiFeatures: [
+        "Auto-flagging gaps in mandatory learning",
+        "Real-time compliance dashboards"
+      ]
+    },
+    "new-hires": {
+      title: "For New Corporate Employees",
+      icon: <BookOpen className="w-5 h-5 text-indigo-600" />,
+      modules: [
+        "OEM Onboarding Journeys",
+        "Systems & Process Familiarization (ERP, CRM, PLM)",
+        "Virtual Mentor Programs"
+      ],
+      aiFeatures: [
+        "Personalized onboarding roadmaps",
+        "AI-driven mentor matching"
+      ]
+    },
+    "career-oriented": {
+      title: "For Career-Oriented Learners",
+      icon: <Compass className="w-5 h-5 text-teal-600" />,
+      modules: [
+        "AI-Driven Career Planning",
+        "Internal Mobility Skills Pathways",
+        "Upskilling for Leadership in Manufacturing 4.0"
+      ],
+      aiFeatures: [
+        "Skill-gap analysis",
+        "Custom learning journeys"
+      ]
+    },
+    "re-training": {
+      title: "For Re-Training / Transitional Learners",
+      icon: <RefreshCcw className="w-5 h-5 text-yellow-600" />,
+      modules: [
+        "Support for Role Changes (e.g., factory to QA)",
+        "Microlearning for New Systems",
+        "Career Reskilling Roadmap"
+      ],
+      aiFeatures: [
+        "Career path suggestions",
+        "Role-matching based on completed training"
+      ]
+    },
+    "self-directed": {
+      title: "For Self-Directed Learners",
+      icon: <Eye className="w-5 h-5 text-gray-600" />,
+      modules: [
+        "Open Exploration Topics (e.g., AI in Manufacturing, Lean Principles)",
+        "Elective Skill Modules (e.g., CAD/CAM, PLC Programming)"
+      ],
+      aiFeatures: [
+        "Interest-based learning dashboard",
+        "Adaptive quiz and learning path recommendations"
+      ]
+    },
+    "general": {
+        title: "General Learning Programs",
+        icon: <BookOpen className="w-5 h-5 text-gray-600" />,
+        modules: ["General company policies", "Basic software usage", "Workplace safety"],
+        aiFeatures: ["General knowledge assessments", "Curated learning paths"]
+    },
+    "all-employees": {
+        title: "Programs for All Employees",
+        icon: <BookOpen className="w-5 h-5 text-gray-600" />,
+        modules: ["Mandatory annual compliance training", "Company culture and values", "Basic cybersecurity awareness"],
+        aiFeatures: ["Automated compliance tracking", "Personalized news feeds"]
+    }
+  };
+
 
   return (
-    <div className="max-w-6xl mx-auto p-6 bg-gray-50 min-h-screen">
-      {/* Header */}
-      <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-800">AI-Enhanced Training Registration</h1>
-            <p className="text-gray-600">Intelligent scheduling and alternative suggestions powered by AI</p>
-          </div>
-          <div className="flex items-center space-x-4">
-            <div className="text-sm text-gray-600">
-              <MapPin className="inline mr-1" size={16} />
-              Your Location: {userLocation}
+    <div className="max-w-7xl mx-auto p-6 bg-gray-50 min-h-screen">
+      <div className="bg-white rounded-lg shadow-sm border mb-6">
+        <div className="px-6 py-4 border-b">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded flex items-center justify-center">
+              <Brain className="w-4 h-4 text-white" />
             </div>
-            {notifications.length > 0 && (
-              <div className="relative">
-                <Bell className="text-blue-600" size={24} />
-                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
-                  {notifications.length}
-                </span>
-              </div>
-            )}
+            <div>
+              <h1 className="text-2xl font-bold text-gray-800">AI Learning Content Approval System</h1>
+              <p className="text-sm text-gray-600">Enhanced workflow with xAPI integration and AI lifecycle tracking</p>
+            </div>
           </div>
         </div>
 
-        {/* Search and Filter */}
-        <div className="flex space-x-4">
-          <div className="flex-1 relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={20} />
-            <input
-              type="text"
-              placeholder="Search classes or topics..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-          </div>
-          <select
-            value={filterCategory}
-            onChange={(e) => setFilterCategory(e.target.value)}
-            className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
-          >
-            <option value="all">All Categories</option>
-            <option value="technical">Technical</option>
-            <option value="service">Service</option>
-            <option value="business">Business</option>
-          </select>
+        <div className="flex border-b overflow-x-auto">
+          {[
+            { id: 'dashboard', label: 'Dashboard', icon: <Layers className="w-4 h-4" /> },
+            { id: 'generate', label: 'AI Generation', icon: <Brain className="w-4 h-4" /> },
+            { id: 'xapi', label: 'xAPI Events', icon: <Database className="w-4 h-4" /> },
+            { id: 'analytics', label: 'Analytics', icon: <Target className="w-4 h-4" /> }
+          ].map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`px-4 py-3 font-medium flex items-center gap-2 whitespace-nowrap ${
+                activeTab === tab.id ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600'
+              }`}
+            >
+              {tab.icon}
+              {tab.label}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* Notifications */}
-      {notifications.length > 0 && (
-        <div className="mb-6 space-y-2">
-          {notifications.map(notification => (
-            <div
-              key={notification.id}
-              className={`p-3 rounded-lg flex items-center ${
-                notification.type === 'success' ? 'bg-green-100 text-green-800' :
-                notification.type === 'info' ? 'bg-blue-100 text-blue-800' :
-                'bg-orange-100 text-orange-800'
-              }`}
-            >
-              <CheckCircle className="mr-2" size={16} />
-              {notification.message}
-              <button
-                onClick={() => setNotifications(notifications.filter(n => n.id !== notification.id))}
-                className="ml-auto text-gray-500 hover:text-gray-700"
-              >
-                ×
-              </button>
+      {activeTab === 'dashboard' && (
+        <div className="space-y-6">
+          {/* Enhanced Stats Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="bg-white p-4 rounded-lg shadow-sm border">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Total Content</p>
+                  <p className="text-2xl font-bold text-gray-800">{stats.total}</p>
+                  <p className="text-xs text-green-600">AI-Generated</p>
+                </div>
+                <BookOpen className="w-8 h-8 text-gray-400" />
+              </div>
             </div>
-          ))}
+            <div className="bg-white p-4 rounded-lg shadow-sm border">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">In Review</p>
+                  <p className="text-2xl font-bold text-yellow-600">{stats.inReview}</p>
+                  <p className="text-xs text-yellow-600">Active Workflow</p>
+                </div>
+                <Clock className="w-8 h-8 text-yellow-400" />
+              </div>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow-sm border">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">Published</p>
+                  <p className="text-2xl font-bold text-green-600">{stats.published}</p>
+                  <p className="text-xs text-green-600">Live for Learners</p>
+                </div>
+                <CheckCircle className="w-8 h-8 text-green-400" />
+              </div>
+            </div>
+            <div className="bg-white p-4 rounded-lg shadow-sm border">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-gray-600">High Risk</p>
+                  <p className="text-2xl font-bold text-red-600">{stats.highRisk}</p>
+                  <p className="text-xs text-red-600">Needs Extra Review</p>
+                </div>
+                <AlertTriangle className="w-8 h-8 text-red-400" />
+              </div>
+            </div>
+          </div>
+
+          {/* Enhanced Content List */}
+          <div className="bg-white rounded-lg shadow-sm border">
+            <div className="px-6 py-4 border-b">
+              <h2 className="text-lg font-semibold text-gray-800">AI Content Approval Pipeline</h2>
+            </div>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Content & AI Details</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Risk Level</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Current Stage</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reviewer</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Generated</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-gray-200">
+                  {contentItems.map((item) => (
+                    <tr key={item.id} className="hover:bg-gray-50">
+                      <td className="px-6 py-4">
+                        <div className="flex items-start gap-3">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
+                          <div className="flex-1">
+                            <p className="text-sm font-medium text-gray-800">{item.title}</p>
+                            <div className="flex items-center gap-4 mt-1 text-xs text-gray-500">
+                              <span className="flex items-center gap-1">
+                                <Brain className="w-3 h-3" />
+                                {item.aiModel} v{item.modelVersion}
+                              </span>
+                              <span>Confidence: {(item.confidenceScore * 100).toFixed(0)}%</span>
+                              <span className="capitalize">{item.type}</span>
+                            </div>
+                            {/* Progress Bar */}
+                            <div className="mt-2">
+                              <div className="flex items-center gap-2 text-xs text-gray-600">
+                                <span>Stage {item.currentStage}/{item.totalStages}</span>
+                                <div className="flex-1 bg-gray-200 rounded-full h-1.5">
+                                  <div 
+                                    className={`h-1.5 rounded-full transition-all duration-300 ${
+                                      item.status === 'rejected' ? 'bg-red-500' : 
+                                      item.status === 'published' ? 'bg-green-500' : 'bg-blue-500'
+                                    }`}
+                                    style={{ width: `${(item.currentStage / item.totalStages) * 100}%` }}
+                                  ></div>
+                                </div>
+                              </div>
+                            </div>
+                            {item.flags.length > 0 && (
+                              <div className="flex gap-1 mt-1">
+                                {item.flags.map(flag => (
+                                  <span key={flag} className="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-xs rounded">
+                                    {flag}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getRiskColor(item.riskLevel)}`}>
+                          {item.riskLevel.toUpperCase()}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(item.status)}`}>
+                          {item.status.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-sm text-gray-600">{item.currentReviewer}</td>
+                      <td className="px-6 py-4 text-sm text-gray-600">{item.generatedAt}</td>
+                      <td className="px-6 py-4">
+                        <button 
+                          onClick={() => setSelectedItem(item)}
+                          className="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                        >
+                          Review
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
       )}
 
-      {/* Class Listings */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {filteredClasses.map(classInfo => (
-          <div key={classInfo.id} className="bg-white rounded-lg shadow-lg p-6">
-            <div className="flex justify-between items-start mb-4">
+      {activeTab === 'generate' && (
+        <div className="bg-white rounded-lg shadow-sm border p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <Brain className="w-6 h-6 text-blue-600" />
+            <h2 className="text-lg font-semibold text-gray-800">AI Content Generation</h2>
+          </div>
+          
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
-                <h3 className="text-xl font-semibold text-gray-800 mb-1">{classInfo.title}</h3>
-                <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
-                  {classInfo.category}
-                </span>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Content Type</label>
+                <select 
+                  value={contentType}
+                  onChange={(e) => setContentType(e.target.value)}
+                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="lesson">Interactive Lesson</option>
+                  <option value="assessment">Quiz/Assessment</option>
+                  <option value="simulation">Simulation</option>
+                  <option value="video-script">Video Script</option>
+                  <option value="job-aid">Job Aid/Reference</option>
+                </select>
               </div>
-              <div className={`px-3 py-1 rounded-full text-sm font-medium ${
-                classInfo.status === 'available' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-              }`}>
-                {classInfo.status === 'available' ? 'Available' : 'Full'}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Target Audience</label>
+                <select 
+                  value={targetAudience}
+                  onChange={(e) => setTargetAudience(e.target.value)}
+                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
+                >
+                  <option value="general">General Employees</option>
+                  <option value="new-hires">New Dealership Hires</option>
+                  <option value="managers">Dealership & Corporate Managers</option>
+                  <option value="leadership">OEM Leadership</option>
+                  <option value="technical">Technical & Service Staff</option>
+                  <option value="salesperson">Frontline Salesperson</option>
+                  <option value="l&d-designers">L&D / Designers</option>
+                  <option value="compliance-officers">Compliance Officers</option>
+                  <option value="career-oriented">Career-Oriented Learners</option>
+                  <option value="re-training">Re-Training / Transitional Learners</option>
+                  <option value="self-directed">Self-Directed Learners</option>
+                  <option value="all-employees">All OEM Corporate Employees</option> {/* Added for clarity */}
+                </select>
               </div>
             </div>
-
-            <div className="grid grid-cols-2 gap-4 mb-4 text-sm text-gray-600">
-              <div className="flex items-center">
-                <Calendar className="mr-2" size={16} />
-                {classInfo.date}
-              </div>
-              <div className="flex items-center">
-                <Clock className="mr-2" size={16} />
-                {classInfo.time}
-              </div>
-              <div className="flex items-center">
-                <MapPin className="mr-2" size={16} />
-                {classInfo.location}
-              </div>
-              <div className="flex items-center">
-                <Users className="mr-2" size={16} />
-                {classInfo.enrolled}/{classInfo.capacity} enrolled
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Learning Objective & Content Prompt</label>
+              <textarea 
+                value={newPrompt}
+                onChange={(e) => setNewPrompt(e.target.value)}
+                placeholder="Describe the learning objectives and content requirements. Be specific about skills, knowledge areas, and desired outcomes..."
+                className="w-full h-32 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+            
+            <div className="bg-blue-50 p-4 rounded-md">
+              <div className="flex items-start gap-3">
+                <Brain className="w-5 h-5 text-blue-600 mt-0.5" />
+                <div className="text-sm">
+                  <p className="text-blue-800 font-medium">AI Generation Process</p>
+                  <p className="text-blue-700 mt-1">Content will be generated → Risk analyzed → Routed for review → Tracked via xAPI</p>
+                </div>
               </div>
             </div>
-
-            <div className="mb-4">
-              <p className="text-sm text-gray-700 mb-2">
-                <strong>Instructor:</strong> {classInfo.instructor}
-              </p>
-              <p className="text-sm text-gray-700">
-                <strong>Topics:</strong> {classInfo.topics.join(', ')}
-              </p>
-            </div>
-
-            <button
-              onClick={() => handleRegistration(classInfo)}
-              className={`w-full py-2 rounded-lg font-medium transition-colors ${
-                classInfo.status === 'available'
-                  ? 'bg-blue-600 text-white hover:bg-blue-700'
-                  : 'bg-orange-600 text-white hover:bg-orange-700'
-              }`}
+            
+            <button 
+              onClick={generateAIContent}
+              disabled={!newPrompt.trim()}
+              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-md hover:from-blue-700 hover:to-purple-700 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
             >
-              {classInfo.status === 'available' ? 'Register Now' : 'View Alternatives'}
+              <Brain className="w-4 h-4" />
+              Generate AI Content
             </button>
           </div>
-        ))}
-      </div>
+        </div>
+      )}
+
+      {activeTab === 'xapi' && (
+        <div className="bg-white rounded-lg shadow-sm border">
+          <div className="px-6 py-4 border-b">
+            <div className="flex items-center gap-3">
+              <Database className="w-5 h-5 text-gray-600" />
+              <h2 className="text-lg font-semibold text-gray-800">xAPI Event Stream</h2>
+              <span className="text-sm text-gray-500">(Learning Record Store Integration)</span>
+            </div>
+          </div>
+          <div className="p-6">
+            <div className="space-y-4 max-h-96 overflow-y-auto">
+              {contentItems.flatMap(item => 
+                item.xapiEvents.map((event, index) => ({
+                  ...event,
+                  contentTitle: item.title,
+                  contentId: item.id,
+                  eventId: `${item.id}-${index}`
+                }))
+              )
+              .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+              .map(event => (
+                <div key={event.eventId} className="border-l-4 border-blue-200 pl-4 py-3 bg-gray-50 rounded-r">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded uppercase">
+                        {event.verb}
+                      </span>
+                      <span className="text-sm font-medium text-gray-800">{event.contentTitle}</span>
+                    </div>
+                    <span className="text-xs text-gray-500">{event.timestamp}</span>
+                  </div>
+                  <div className="text-sm text-gray-600">
+                    <span className="font-medium">Actor:</span> {event.actor}
+                    {event.comments && (
+                      <div className="mt-1">
+                        <span className="font-medium">Comments:</span> {event.comments}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'analytics' && (
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="bg-white rounded-lg shadow-sm border p-6">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">AI Model Performance</h3>
+              <div className="space-y-3">
+                {[
+                  { model: 'GPT-4', version: '4.0.3', avgConfidence: 0.94, contentCount: 45 },
+                  { model: 'Claude Sonnet', version: '3.5', avgConfidence: 0.89, contentCount: 23 },
+                  { model: 'Gemini Pro', version: '1.5', avgConfidence: 0.92, contentCount: 31 }
+                ].map(model => (
+                  <div key={`${model.model}-${model.version}`} className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                    <div>
+                      <p className="font-medium text-gray-800">{model.model} v{model.version}</p>
+                      <p className="text-sm text-gray-600">{model.contentCount} content items</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-lg font-bold text-green-600">{(model.avgConfidence * 100).toFixed(0)}%</p>
+                      <p className="text-xs text-gray-500">Avg Confidence</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <div className="bg-white rounded-lg shadow-sm border p-6">
+              <h3 className="text-lg font-semibold text-gray-800 mb-4">Review Bottlenecks</h3>
+              <div className="space-y-3">
+                {[
+                  { stage: 'DEI Review', avgDays: 2.3, backlog: 8 },
+                  { stage: 'Legal Review', avgDays: 1.8, backlog: 3 },
+                  { stage: 'SME Review', avgDays: 1.2, backlog: 12 },
+                  { stage: 'LXD Review', avgDays: 0.9, backlog: 5 }
+                ].map(stage => (
+                  <div key={stage.stage} className="flex items-center justify-between p-3 bg-gray-50 rounded">
+                    <div>
+                      <p className="font-medium text-gray-800">{stage.stage}</p>
+                      <p className="text-sm text-gray-600">{stage.backlog} items in queue</p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-lg font-bold text-yellow-600">{stage.avgDays}d</p>
+                      <p className="text-xs text-gray-500">Avg Review Time</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Enhanced Review Modal */}
+      {selectedItem && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="px-6 py-4 border-b">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Brain className="w-5 h-5 text-blue-600" />
+                  <h3 className="text-lg font-semibold text-gray-800">AI Content Review</h3>
+                </div>
+                <button 
+                  onClick={() => {
+                    setSelectedItem(null);
+                    setRejectionComments(''); // Clear comments when closing modal
+                  }}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+            
+            <div className="p-6 space-y-6">
+              {/* AI Metadata */}
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <h4 className="font-medium text-blue-800 mb-3">AI Generation Details</h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <span className="font-medium text-blue-700">Model:</span> {selectedItem.aiModel} v{selectedItem.modelVersion}
+                  </div>
+                  <div>
+                    <span className="font-medium text-blue-700">Confidence:</span> {(selectedItem.confidenceScore * 100).toFixed(0)}%
+                  </div>
+                  <div className="md:col-span-2">
+                    <span className="font-medium text-blue-700">Original Prompt:</span>
+                    <p className="mt-1 text-blue-800 italic">"{selectedItem.prompt}"</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Content Preview */}
+              <div>
+                <h4 className="font-medium text-gray-800 mb-3">Content Preview</h4>
+                <div className="bg-gray-50 p-4 rounded-md border">
+                  <h5 className="font-medium text-gray-700 mb-2">{selectedItem.title}</h5>
+                  <p className="text-sm text-gray-700">{selectedItem.contentPreview}</p>
+                </div>
+              </div>
+
+              {/* Associated Learning Program Details */}
+              {selectedItem.targetAudience && learningProgramsMap[selectedItem.targetAudience] && (
+                <div>
+                  <h4 className="font-medium text-gray-800 mb-3">Associated Learning Program Details</h4>
+                  <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 shadow-sm">
+                    <div className="flex items-center gap-3 mb-3">
+                      {learningProgramsMap[selectedItem.targetAudience].icon}
+                      <h3 className="text-md font-semibold text-gray-800">
+                        {learningProgramsMap[selectedItem.targetAudience].title}
+                      </h3>
+                    </div>
+                    <div className="mb-4">
+                      <p className="text-sm font-medium text-gray-700 mb-2">Modules:</p>
+                      <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
+                        {learningProgramsMap[selectedItem.targetAudience].modules.map((module, modIndex) => (
+                          <li key={modIndex}>{module}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    <div>
+                      <p className="text-sm font-medium text-gray-700 mb-2">AI Features:</p>
+                      <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
+                        {learningProgramsMap[selectedItem.targetAudience].aiFeatures.map((feature, featIndex) => (
+                          <li key={featIndex}>{feature}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Workflow Progress Visualization */}
+              <div>
+                <h4 className="font-medium text-gray-800 mb-3">Workflow Progress</h4>
+                <div className="space-y-2">
+                  {selectedItem.workflowPath.map((stage, index) => (
+                    <div key={index} className="flex items-center gap-3">
+                      <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
+                        stage.status === 'completed' ? 'bg-green-500 text-white' :
+                        stage.status === 'in-progress' ? 'bg-blue-500 text-white' :
+                        stage.status === 'rejected' ? 'bg-red-500 text-white' :
+                        stage.status === 'cancelled' ? 'bg-gray-400 text-white' :
+                        stage.status === 'skipped' ? 'bg-yellow-500 text-white' :
+                        'bg-gray-200 text-gray-600'
+                      }`}>
+                        {index + 1}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-medium text-gray-800">{stage.stage}</span>
+                          <span className={`text-xs px-2 py-1 rounded uppercase font-medium ${
+                            stage.status === 'completed' ? 'bg-green-100 text-green-700' :
+                            stage.status === 'in-progress' ? 'bg-blue-100 text-blue-700' :
+                            stage.status === 'rejected' ? 'bg-red-100 text-red-700' :
+                            stage.status === 'cancelled' ? 'bg-gray-100 text-gray-600' :
+                            stage.status === 'skipped' ? 'bg-yellow-100 text-yellow-700' :
+                            'bg-gray-50 text-gray-500'
+                          }`}>
+                            {stage.status}
+                          </span>
+                        </div>
+                        <div className="text-xs text-gray-600 mt-1">
+                          {stage.reviewer}
+                          {stage.completedAt && <span className="ml-2">• Completed: {stage.completedAt}</span>}
+                          {stage.assignedAt && stage.status === 'in-progress' && <span className="ml-2">• Assigned: {stage.assignedAt}</span>}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Rejection History */}
+              {selectedItem.rejectionHistory && selectedItem.rejectionHistory.length > 0 && (
+                <div>
+                  <h4 className="font-medium text-gray-800 mb-3">Rejection History & Feedback</h4>
+                  <div className="space-y-4">
+                    {selectedItem.rejectionHistory.map((rejection, index) => (
+                      <div key={index} className="bg-red-50 border border-red-200 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-2">
+                          <div className="flex items-center gap-2">
+                            <XCircle className="w-4 h-4 text-red-600" />
+                            <span className="text-sm font-medium text-red-800">{rejection.stage}</span>
+                            <span className={`px-2 py-1 rounded text-xs font-medium ${
+                              rejection.severity === 'major' ? 'bg-red-200 text-red-800' :
+                              rejection.severity === 'minor' ? 'bg-yellow-200 text-yellow-800' :
+                              'bg-gray-200 text-gray-800'
+                            }`}>
+                              {rejection.severity} Issues
+                            </span>
+                          </div>
+                          <span className="text-xs text-red-600">{rejection.rejectedAt}</span>
+                        </div>
+                        <div className="text-sm text-red-700 mb-2">
+                          <strong>Reviewer:</strong> {rejection.reviewer}
+                        </div>
+                        <div className="text-sm text-red-800 mb-3">
+                          <strong>Reason:</strong> {rejection.reason}
+                        </div>
+                        {rejection.feedback && rejection.feedback.length > 0 && (
+                          <div>
+                            <p className="text-sm font-medium text-red-800 mb-2">Specific Feedback:</p>
+                            <ul className="list-disc list-inside text-sm text-red-700 space-y-1">
+                              {rejection.feedback.map((item, idx) => (
+                                <li key={idx}>{item}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* xAPI History */}
+              <div>
+                <h4 className="font-medium text-gray-800 mb-3">Review History (xAPI Events)</h4>
+                <div className="space-y-2 max-h-32 overflow-y-auto">
+                  {selectedItem.xapiEvents.map((event, index) => (
+                    <div key={index} className="flex items-center gap-3 text-sm">
+                      <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs uppercase font-medium">
+                        {event.verb}
+                      </span>
+                      <span className="text-gray-600">{event.actor}</span>
+                      <span className="text-gray-500 text-xs">{event.timestamp}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Risk Assessment */}
+              <div>
+                <h4 className="font-medium text-gray-800 mb-3">Risk Assessment</h4>
+                <div className="flex items-center gap-4">
+                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${getRiskColor(selectedItem.riskLevel)}`}>
+                    {selectedItem.riskLevel.toUpperCase()} RISK
+                  </span>
+                  <span className="text-sm text-gray-600">Target: {selectedItem.targetAudience.replace('-', ' ')}</span>
+                </div>
+              </div>
+
+              {/* Review Actions */}
+              {!['published', 'rejected'].includes(selectedItem.status) && (
+                <div className="flex flex-col gap-3 pt-4 border-t">
+                  {/* Rejection Comments Textarea */}
+                  <div className="w-full">
+                    <label htmlFor="rejectionComments" className="block text-sm font-medium text-gray-700 mb-2">
+                      Rejection Reason & Feedback:
+                    </label>
+                    <textarea
+                      id="rejectionComments"
+                      value={rejectionComments}
+                      onChange={(e) => setRejectionComments(e.target.value)}
+                      placeholder="Provide detailed reasons for rejection and suggestions for improvement..."
+                      rows="4"
+                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
+                    ></textarea>
+                  </div>
+
+                  <div className="flex gap-3">
+                    <button 
+                      onClick={() => handleReviewAction(selectedItem.id, 'approve')}
+                      className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 flex items-center gap-2"
+                    >
+                      <CheckCircle className="w-4 h-4" />
+                      Approve & Forward
+                    </button>
+                    <button 
+                      onClick={() => handleReviewAction(selectedItem.id, 'reject', rejectionComments)}
+                      disabled={!rejectionComments.trim()} // Disable if no comments for rejection
+                      className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
+                    >
+                      <XCircle className="w-4 h-4" />
+                      Reject with Detailed Feedback
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-export default TrainingRegistrationSystem;
+export default AILearningApprovalWorkflow;
