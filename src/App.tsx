@@ -3,7 +3,7 @@ import { CheckCircle, XCircle, Clock, Eye, FileText, Users, AlertTriangle, Brain
 
 const AILearningApprovalWorkflow = () => {
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [selectedItem, setSelectedItem] = useState(null);
+  const [selectedItem, setSelectedItem] = useState<any>(null);
   const [newPrompt, setNewPrompt] = useState('');
   const [contentType, setContentType] = useState('lesson');
   const [targetAudience, setTargetAudience] = useState('general');
@@ -24,7 +24,7 @@ const AILearningApprovalWorkflow = () => {
       submittedBy: "AI Content Generator",
       currentReviewer: "Regional Sales Trainer",
       riskLevel: "medium",
-      targetAudience: "new-hires", // Maps to 'new-hires' in learningProgramsMap
+      targetAudience: "new-hires",
       contentPreview: "Welcome to your OEM Sales Journey! This module will equip you with essential product knowledge to confidently present our vehicles...",
       flags: ["product-info", "sales-training"],
       currentStage: 2,
@@ -60,7 +60,7 @@ const AILearningApprovalWorkflow = () => {
       submittedBy: "AI Content Generator",
       currentReviewer: "Corporate IT Lead",
       riskLevel: "high",
-      targetAudience: "managers", // Maps to 'managers' in learningProgramsMap
+      targetAudience: "managers",
       contentPreview: "Master our CRM to supercharge your sales pipeline. This training focuses on data-driven lead qualification and efficient opportunity management...",
       flags: ["crm-training", "data-analytics"],
       currentStage: 4,
@@ -96,7 +96,7 @@ const AILearningApprovalWorkflow = () => {
       submittedBy: "AI Content Generator",
       currentReviewer: "Published",
       riskLevel: "low",
-      targetAudience: "all-employees", // Maps to 'all-employees' in learningProgramsMap
+      targetAudience: "all-employees",
       contentPreview: "Test your knowledge on essential service bay safety. This quiz covers critical procedures for electric vehicle handling, lift operations, and hazardous waste disposal...",
       flags: ["assessment", "safety-training"],
       approvedBy: "Full Review Chain",
@@ -126,8 +126,8 @@ const AILearningApprovalWorkflow = () => {
   // Define a type for the allowed status keys
   type StatusKey = 'ai-generation' | 'risk-analysis' | 'sme-review' | 'legal-review' | 'dei-review' | 'lxd-review' | 'final-approval' | 'published' | 'rejected';
   
-  const getStatusColor = (status: StatusKey) => { // Use the defined type
-    const colors: Record<StatusKey, string> = { // Add index signature or use mapped type
+  const getStatusColor = (status: string) => {
+    const colors: Record<string, string> = {
       'ai-generation': 'text-blue-600 bg-blue-100',
       'risk-analysis': 'text-purple-600 bg-purple-100',
       'sme-review': 'text-yellow-600 bg-yellow-100',
@@ -144,8 +144,8 @@ const AILearningApprovalWorkflow = () => {
   // Define a type for the allowed risk keys
   type RiskKey = 'low' | 'medium' | 'high';
 
-  const getRiskColor = (risk: RiskKey) => { // Use the defined type
-    const colors: Record<RiskKey, string> = { // Add index signature or use mapped type
+  const getRiskColor = (risk: string) => {
+    const colors: Record<string, string> = {
       'low': 'text-green-600 bg-green-100',
       'medium': 'text-yellow-600 bg-yellow-100',
       'high': 'text-red-600 bg-red-100'
@@ -204,7 +204,7 @@ const AILearningApprovalWorkflow = () => {
   // Define types for action and comments
   type ReviewAction = 'approve' | 'reject';
 
-  const handleReviewAction = (itemId: number, action: ReviewAction, comments: string = '') => { // Added type annotations
+  const handleReviewAction = (itemId: number, action: ReviewAction, comments: string = '') => {
     setContentItems(prev => prev.map(item => {
       if (item.id === itemId) {
         const timestamp = new Date().toLocaleString();
@@ -212,8 +212,8 @@ const AILearningApprovalWorkflow = () => {
         
         if (action === 'approve') {
           // Move to next stage in workflow
-          const nextStageIndex = item.workflowPath.findIndex(stage => stage.status === 'in-progress') + 1;
-          const updatedWorkflowPath = item.workflowPath.map((stage, index) => {
+          const nextStageIndex = item.workflowPath.findIndex((stage: any) => stage.status === 'in-progress') + 1;
+          const updatedWorkflowPath = item.workflowPath.map((stage: any, index: number) => {
             if (index === nextStageIndex - 1) {
               return { ...stage, status: 'completed', completedAt: timestamp };
             }
@@ -228,14 +228,15 @@ const AILearningApprovalWorkflow = () => {
           let newReviewer = item.currentReviewer;
           let newCurrentStage = item.currentStage;
 
-          const statusFlow = {
+          // Fixed statusFlow with proper typing
+          const statusFlow: Record<string, { status: string; reviewer: string; stage: number }> = {
             'sme-review': { status: 'legal-review', reviewer: 'Legal Team', stage: 3 },
             'legal-review': { status: 'dei-review', reviewer: 'DEI Officer', stage: 4 },
             'dei-review': { status: 'final-approval', reviewer: 'Learning Director', stage: 5 },
             'final-approval': { status: 'published', reviewer: 'Published', stage: 6 }
           };
 
-          const next = statusFlow[item.status as StatusKey]; // Cast to StatusKey
+          const next = statusFlow[item.status];
           if (next) {
             newStatus = next.status;
             newReviewer = next.reviewer;
@@ -252,18 +253,18 @@ const AILearningApprovalWorkflow = () => {
 
         } else if (action === 'reject') {
           // Create rejection entry
-          const currentStageInfo = item.workflowPath.find(stage => stage.status === 'in-progress');
+          const currentStageInfo = item.workflowPath.find((stage: any) => stage.status === 'in-progress');
           const rejectionEntry = {
             stage: currentStageInfo?.stage || 'Unknown Stage',
             reviewer: 'Current User',
             rejectedAt: timestamp,
             reason: comments,
-            feedback: [], // This could be expanded to parse structured feedback
-            severity: 'major' // This could be determined by the reviewer
+            feedback: [],
+            severity: 'major'
           };
 
           // Update workflow path to show rejection
-          const updatedWorkflowPath = item.workflowPath.map(stage => {
+          const updatedWorkflowPath = item.workflowPath.map((stage: any) => {
             if (stage.status === 'in-progress') {
               return { ...stage, status: 'rejected', completedAt: timestamp };
             }
@@ -297,7 +298,7 @@ const AILearningApprovalWorkflow = () => {
       return item;
     }));
     setSelectedItem(null);
-    setRejectionComments(''); // Clear comments after action
+    setRejectionComments('');
   };
 
   const stats = {
@@ -308,7 +309,7 @@ const AILearningApprovalWorkflow = () => {
   };
 
   // Mapping target audiences to their respective learning programs and AI features
-  const learningProgramsMap = {
+  const learningProgramsMap: Record<string, any> = {
     "technical": {
       title: "For Technical/Service Staff",
       icon: <GraduationCap className="w-5 h-5 text-blue-600" />,
@@ -439,7 +440,6 @@ const AILearningApprovalWorkflow = () => {
         aiFeatures: ["Automated compliance tracking", "Personalized news feeds"]
     }
   };
-
 
   return (
     <div className="max-w-7xl mx-auto p-6 bg-gray-50 min-h-screen">
@@ -573,7 +573,7 @@ const AILearningApprovalWorkflow = () => {
                             </div>
                             {item.flags.length > 0 && (
                               <div className="flex gap-1 mt-1">
-                                {item.flags.map(flag => (
+                                {item.flags.map((flag: string) => (
                                   <span key={flag} className="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-xs rounded">
                                     {flag}
                                   </span>
@@ -590,7 +590,7 @@ const AILearningApprovalWorkflow = () => {
                       </td>
                       <td className="px-6 py-4">
                         <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(item.status)}`}>
-                          {item.status.replace('-', ' ').replace(/\b\w/g, l => l.toUpperCase())}
+                          {item.status.replace('-', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
                         </span>
                       </td>
                       <td className="px-6 py-4 text-sm text-gray-600">{item.currentReviewer}</td>
@@ -653,7 +653,7 @@ const AILearningApprovalWorkflow = () => {
                   <option value="career-oriented">Career-Oriented Learners</option>
                   <option value="re-training">Re-Training / Transitional Learners</option>
                   <option value="self-directed">Self-Directed Learners</option>
-                  <option value="all-employees">All OEM Corporate Employees</option> {/* Added for clarity */}
+                  <option value="all-employees">All OEM Corporate Employees</option>
                 </select>
               </div>
             </div>
@@ -702,15 +702,15 @@ const AILearningApprovalWorkflow = () => {
           <div className="p-6">
             <div className="space-y-4 max-h-96 overflow-y-auto">
               {contentItems.flatMap(item => 
-                item.xapiEvents.map((event, index) => ({
+                item.xapiEvents.map((event: any, index: number) => ({
                   ...event,
                   contentTitle: item.title,
                   contentId: item.id,
                   eventId: `${item.id}-${index}`
                 }))
               )
-              .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
-              .map(event => (
+              .sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+              .map((event: any) => (
                 <div key={event.eventId} className="border-l-4 border-blue-200 pl-4 py-3 bg-gray-50 rounded-r">
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-2">
@@ -800,7 +800,7 @@ const AILearningApprovalWorkflow = () => {
                 <button 
                   onClick={() => {
                     setSelectedItem(null);
-                    setRejectionComments(''); // Clear comments when closing modal
+                    setRejectionComments('');
                   }}
                   className="text-gray-500 hover:text-gray-700"
                 >
@@ -850,7 +850,7 @@ const AILearningApprovalWorkflow = () => {
                     <div className="mb-4">
                       <p className="text-sm font-medium text-gray-700 mb-2">Modules:</p>
                       <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
-                        {learningProgramsMap[selectedItem.targetAudience].modules.map((module, modIndex) => (
+                        {learningProgramsMap[selectedItem.targetAudience].modules.map((module: string, modIndex: number) => (
                           <li key={modIndex}>{module}</li>
                         ))}
                       </ul>
@@ -858,7 +858,7 @@ const AILearningApprovalWorkflow = () => {
                     <div>
                       <p className="text-sm font-medium text-gray-700 mb-2">AI Features:</p>
                       <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
-                        {learningProgramsMap[selectedItem.targetAudience].aiFeatures.map((feature, featIndex) => (
+                        {learningProgramsMap[selectedItem.targetAudience].aiFeatures.map((feature: string, featIndex: number) => (
                           <li key={featIndex}>{feature}</li>
                         ))}
                       </ul>
@@ -871,7 +871,7 @@ const AILearningApprovalWorkflow = () => {
               <div>
                 <h4 className="font-medium text-gray-800 mb-3">Workflow Progress</h4>
                 <div className="space-y-2">
-                  {selectedItem.workflowPath.map((stage, index) => (
+                  {selectedItem.workflowPath.map((stage: any, index: number) => (
                     <div key={index} className="flex items-center gap-3">
                       <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
                         stage.status === 'completed' ? 'bg-green-500 text-white' :
@@ -913,7 +913,7 @@ const AILearningApprovalWorkflow = () => {
                 <div>
                   <h4 className="font-medium text-gray-800 mb-3">Rejection History & Feedback</h4>
                   <div className="space-y-4">
-                    {selectedItem.rejectionHistory.map((rejection, index) => (
+                    {selectedItem.rejectionHistory.map((rejection: any, index: number) => (
                       <div key={index} className="bg-red-50 border border-red-200 rounded-lg p-4">
                         <div className="flex items-center justify-between mb-2">
                           <div className="flex items-center gap-2">
@@ -939,7 +939,7 @@ const AILearningApprovalWorkflow = () => {
                           <div>
                             <p className="text-sm font-medium text-red-800 mb-2">Specific Feedback:</p>
                             <ul className="list-disc list-inside text-sm text-red-700 space-y-1">
-                              {rejection.feedback.map((item, idx) => (
+                              {rejection.feedback.map((item: string, idx: number) => (
                                 <li key={idx}>{item}</li>
                               ))}
                             </ul>
@@ -955,7 +955,7 @@ const AILearningApprovalWorkflow = () => {
               <div>
                 <h4 className="font-medium text-gray-800 mb-3">Review History (xAPI Events)</h4>
                 <div className="space-y-2 max-h-32 overflow-y-auto">
-                  {selectedItem.xapiEvents.map((event, index) => (
+                  {selectedItem.xapiEvents.map((event: any, index: number) => (
                     <div key={index} className="flex items-center gap-3 text-sm">
                       <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs uppercase font-medium">
                         {event.verb}
@@ -991,7 +991,7 @@ const AILearningApprovalWorkflow = () => {
                       value={rejectionComments}
                       onChange={(e) => setRejectionComments(e.target.value)}
                       placeholder="Provide detailed reasons for rejection and suggestions for improvement..."
-                      rows="4"
+                      rows={4}
                       className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
                     ></textarea>
                   </div>
@@ -1006,7 +1006,7 @@ const AILearningApprovalWorkflow = () => {
                     </button>
                     <button 
                       onClick={() => handleReviewAction(selectedItem.id, 'reject', rejectionComments)}
-                      disabled={!rejectionComments.trim()} // Disable if no comments for rejection
+                      disabled={!rejectionComments.trim()}
                       className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
                     >
                       <XCircle className="w-4 h-4" />
