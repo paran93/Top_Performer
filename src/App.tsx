@@ -217,8 +217,6 @@ const UnifiedLearningPlatform = () => {
             // Ensure all properties expected in individual view are present, even if with default values.
             return {
                 ...user,
-                // These are already in the `user` state now, but keeping them here for clarity
-                // if you ever remove them from the default user state later.
                 newCarsSold: user.newCarsSold,
                 completedModules: user.completedModules,
                 totalModules: user.totalModules,
@@ -258,7 +256,6 @@ const UnifiedLearningPlatform = () => {
                 trainingCompletionRate: 0,
                 lastLogin: 'N/A'
             },
-            // Explicitly ensure newCarsSold is picked from member if available, else default from user
             newCarsSold: member?.newCarsSold !== undefined ? member.newCarsSold : user.newCarsSold,
         };
     };
@@ -1222,7 +1219,7 @@ ${complianceAlerts.map(alert => `
                 <div className="space-y-6">
                     <h2 className="text-2xl font-bold text-gray-900 mb-4">STAR Rewards for {currentUser.name}</h2>
 
-                    <div className="bg-white p-6 rounded-xl shadow-sm flex items-center justify-between">
+                    <div className="bg-white rounded-xl shadow-sm p-6 flex items-center justify-between">
                         <div className="flex items-center space-x-4">
                             <Trophy className="w-12 h-12 text-yellow-600" />
                             <div>
