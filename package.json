@@ -1,0 +1,21 @@
+{
+  "name": "react-heroku-app",
+  "version": "1.0.0",
+  "description": "React + TypeScript app hosted on Heroku",
+  "scripts": {
+    "start": "node server.js",
+    "build": "react-scripts build",
+    "heroku-postbuild": "npm run build"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "typescript": "^4.8.4"
+  },
+  "engines": {
+    "node": ">=16.x"
+  }
+}
+
