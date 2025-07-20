@@ -971,7 +971,7 @@ ${complianceAlerts.map(alert => `
                             <textarea
                                 id="nudgeMessage"
                                 name="nudgeMessage"
-                                rows="3"
+                                rows={3}
                                 className="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
                                 placeholder="Type your nudge message here..."
                             ></textarea>
