@@ -201,7 +201,10 @@ const AILearningApprovalWorkflow = () => {
     }
   };
 
-  const handleReviewAction = (itemId, action, comments = '') => {
+  // Define types for action and comments
+  type ReviewAction = 'approve' | 'reject';
+
+  const handleReviewAction = (itemId: number, action: ReviewAction, comments: string = '') => { // Added type annotations
     setContentItems(prev => prev.map(item => {
       if (item.id === itemId) {
         const timestamp = new Date().toLocaleString();
@@ -232,7 +235,7 @@ const AILearningApprovalWorkflow = () => {
             'final-approval': { status: 'published', reviewer: 'Published', stage: 6 }
           };
 
-          const next = statusFlow[item.status];
+          const next = statusFlow[item.status as StatusKey]; // Cast to StatusKey
           if (next) {
             newStatus = next.status;
             newReviewer = next.reviewer;
