@@ -1,1299 +1,750 @@
-import React, { useState, useEffect } from 'react';
-import { Star, BookOpen, Trophy, Bell, AlertTriangle, Calendar, DollarSign, Users, CheckCircle, Clock, Mail, Smartphone, TrendingUp, Eye, Download, UserCheck, AlertCircle, Target, BarChart3, Shield, Zap, FileText, Settings, Award } from 'lucide-react';
+import React, { useState } from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, ScatterChart, Scatter, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar } from 'recharts';
+import { Users, TrendingUp, Award, Target, Brain, AlertTriangle, CheckCircle, Star, Filter, Download, Search, Eye, BookOpen, Clock, MessageSquare, MapPin, Zap } from 'lucide-react';
 
-const UnifiedLearningPlatform = () => {
-    const [user] = useState({
-        name: "Sarah Martinez",
-        role: "Sales Manager",
-        dealership: "Metro Hyundai",
-        region: "Southwest",
-        starQualified: true,
-        currentMonth: "July 2025",
-        salesCloseDate: "July 31, 2025, 11:59 PM PT",
-        daysRemaining: 3,
-        newCarsSold: 0,
-        completedModules: 0,
-        totalModules: 0,
-        complianceScore: 100,
-        lastActivity: 'N/A',
-        hireDate: 'N/A',
-        email: 'sarah.martinez@metrohyundai.com',
-        phone: '(555) 000-0000',
-        manager: 'N/A',
-        territory: 'All Regions',
-        ytdSales: 0,
-        avgCustomerRating: 0,
-        certifications: [],
-        trainingModules: [],
-        recentNudges: [],
-        certificationIssues: [],
-        engagement: {
-            nudgeOpenRate: 0,
-            trainingCompletionRate: 0,
-            lastLogin: 'N/A'
-        }
-    });
+const WorkforcePerformancePlatform = () => {
+  const [selectedRegion, setSelectedRegion] = useState('All Regions');
+  const [selectedRole, setSelectedRole] = useState('All Roles');
+  const [selectedThreshold, setSelectedThreshold] = useState('Top 50');
+  const [activeTab, setActiveTab] = useState('analysis');
 
-    const [activeTab, setActiveTab] = useState('overview');
-    const [selectedEmployee, setSelectedEmployee] = useState('self');
-    const [viewMode, setViewMode] = useState('overview');
-    const [notifications, setNotifications] = useState([]);
+  // Updated regions
+  const regions = ['All Regions', 'Central', 'Eastern', 'Mid-Atlantic', 'Mountain States', 'S Central', 'Southern', 'Western'];
+  
+  // Sample data with more comprehensive analysis
+  const topPerformersData = [
+    { 
+      name: 'Sarah Chen', 
+      role: 'Sales Consultant', 
+      region: 'Western', 
+      performanceScore: 94, 
+      trend: '+8%',
+      engagement: 92,
+      trainingHours: 45,
+      completionRate: 98,
+      managerFeedback: 4.8,
+      experience: '3.5 years',
+      certifications: 5,
+      avatar: 'SC',
+      keyStrengths: ['Customer Rapport', 'Product Knowledge', 'Follow-up Excellence'],
+      predictiveScore: 87
+    },
+    { 
+      name: 'Marcus Johnson', 
+      role: 'Sales Manager', 
+      region: 'Eastern', 
+      performanceScore: 92, 
+      trend: '+5%',
+      engagement: 89,
+      trainingHours: 52,
+      completionRate: 95,
+      managerFeedback: 4.9,
+      experience: '5.2 years',
+      certifications: 7,
+      avatar: 'MJ',
+      keyStrengths: ['Team Leadership', 'Training Others', 'Strategic Planning'],
+      predictiveScore: 91
+    },
+    { 
+      name: 'Lisa Rodriguez', 
+      role: 'Service Advisor', 
+      region: 'S Central', 
+      performanceScore: 91, 
+      trend: '+12%',
+      engagement: 94,
+      trainingHours: 38,
+      completionRate: 96,
+      managerFeedback: 4.7,
+      experience: '2.8 years',
+      certifications: 4,
+      avatar: 'LR',
+      keyStrengths: ['Customer Service', 'Technical Knowledge', 'Problem Solving'],
+      predictiveScore: 85
+    },
+    { 
+      name: 'David Kim', 
+      role: 'Technician', 
+      region: 'Mountain States', 
+      performanceScore: 89, 
+      trend: '+3%',
+      engagement: 88,
+      trainingHours: 41,
+      completionRate: 94,
+      managerFeedback: 4.6,
+      experience: '4.1 years',
+      certifications: 6,
+      avatar: 'DK',
+      keyStrengths: ['Diagnostic Skills', 'Efficiency', 'Quality Work'],
+      predictiveScore: 82
+    },
+    { 
+      name: 'Emily Foster', 
+      role: 'Sales Consultant', 
+      region: 'Mid-Atlantic', 
+      performanceScore: 88, 
+      trend: '+7%',
+      engagement: 91,
+      trainingHours: 43,
+      completionRate: 97,
+      managerFeedback: 4.8,
+      experience: '1.9 years',
+      certifications: 3,
+      avatar: 'EF',
+      keyStrengths: ['Fast Learner', 'Digital Savvy', 'Customer Focus'],
+      predictiveScore: 89
+    }
+  ];
 
-    const [teamMembers, setTeamMembers] = useState([
-        {
-            id: 'mike',
-            name: 'Mike Rodriguez',
-            role: 'Sales Consultant',
-            starQualified: false,
-            newCarsSold: 14,
-            completedModules: 4,
-            totalModules: 6,
-            daysRemaining: 3,
-            status: 'at_risk',
-            certificationIssues: ['Product Knowledge expires in 12 days'],
-            complianceScore: 75,
-            lastActivity: '2 days ago',
-            hireDate: 'March 2023',
-            email: 'mike.rodriguez@metrohyundai.com',
-            phone: '(555) 123-4567',
-            manager: 'Sarah Martinez',
-            territory: 'Downtown',
-            ytdSales: 156,
-            avgCustomerRating: 4.2,
-            certifications: [
-                { name: 'Product Knowledge', status: 'expiring', expiryDate: 'August 12, 2025' },
-                { name: 'Sales Fundamentals', status: 'current', expiryDate: 'December 15, 2025' },
-                { name: 'Finance & Insurance', status: 'current', expiryDate: 'October 8, 2025' },
-                { name: 'Customer Service Excellence', status: 'pending_renewal', expiryDate: 'August 1, 2025' }
-            ],
-            trainingModules: [
-                { id: 1, name: '2025 Hyundai Model Updates', status: 'completed', completedDate: 'July 18, 2025', score: 92, duration: "30 min" },
-                { id: 2, name: 'Digital Sales Tools', status: 'completed', completedDate: 'July 15, 2025', score: 88, duration: "45 min" },
-                { id: 3, name: 'Customer Retention Strategies', status: 'completed', completedDate: 'July 12, 2025', score: 95, duration: "60 min" },
-                { id: 4, name: 'Financing Options Deep Dive', status: 'completed', completedDate: 'July 10, 2025', score: 85, duration: "40 min" },
-                { id: 5, name: 'Competitive Analysis Workshop', status: 'in_progress', progress: 60, dueDate: 'July 30, 2025', duration: "50 min" },
-                { id: 6, name: 'Q3 Sales Strategy Session', status: 'not_started', dueDate: 'July 31, 2025', duration: "35 min" }
-            ],
-            recentNudges: [
-                { type: 'urgent', message: 'Complete Q3 Sales Strategy to maintain STAR qualification', sent: '2 hours ago' },
-                { type: 'reminder', message: 'Product Knowledge certification expires in 12 days', sent: '1 day ago' }
-            ],
-            engagement: {
-                nudgeOpenRate: 78,
-                trainingCompletionRate: 89,
-                lastLogin: '2 days ago'
-            }
-        },
-        {
-            id: 'sarah',
-            name: 'Sarah Chen',
-            role: 'Sales Consultant',
-            starQualified: true,
-            newCarsSold: 18,
-            completedModules: 6,
-            totalModules: 6,
-            daysRemaining: 3,
-            status: 'qualified',
-            certificationIssues: [],
-            complianceScore: 100,
-            lastActivity: '1 day ago',
-            hireDate: 'January 2022',
-            email: 'sarah.chen@metrohyundai.com',
-            phone: '(555) 234-5678',
-            manager: 'Sarah Martinez',
-            territory: 'Midtown',
-            ytdSales: 198,
-            avgCustomerRating: 4.8,
-            certifications: [
-                { name: 'Product Knowledge', status: 'current', expiryDate: 'November 22, 2025' },
-                { name: 'Sales Fundamentals', status: 'current', expiryDate: 'January 10, 2026' },
-                { name: 'Finance & Insurance', status: 'current', expiryDate: 'September 18, 2025' },
-                { name: 'Customer Service Excellence', status: 'current', expiryDate: 'December 3, 2025' },
-                { name: 'Advanced Sales Techniques', status: 'current', expiryDate: 'October 15, 2025' }
-            ],
-            trainingModules: [
-                { id: 1, name: '2025 Hyundai Model Updates', status: 'completed', completedDate: 'July 20, 2025', score: 98, duration: "30 min" },
-                { id: 2, name: 'Digital Sales Tools', status: 'completed', completedDate: 'July 19, 2025', score: 94, duration: "45 min" },
-                { id: 3, name: 'Customer Retention Strategies', status: 'completed', completedDate: 'July 17, 2025', score: 96, duration: "60 min" },
-                { id: 4, name: 'Financing Options Deep Dive', status: 'completed', completedDate: 'July 16, 2025', score: 91, duration: "40 min" },
-                { id: 5, name: 'Competitive Analysis Workshop', status: 'completed', completedDate: 'July 14, 2025', score: 89, duration: "50 min" },
-                { id: 6, name: 'Q3 Sales Strategy Session', status: 'completed', completedDate: 'July 13, 2025', score: 93, duration: "35 min" }
-            ],
-            recentNudges: [
-                { type: 'congratulations', message: 'Excellent work! 100% STAR compliance achieved', sent: '1 day ago' },
-                { type: 'recognition', message: 'Top performer this month - 18 cars sold!', sent: '3 days ago' }
-            ],
-            engagement: {
-                nudgeOpenRate: 95,
-                trainingCompletionRate: 100,
-                lastLogin: '1 day ago'
-            }
-        },
-        {
-            id: 'david',
-            name: 'David Thompson',
-            role: 'Sales Consultant',
-            starQualified: false,
-            newCarsSold: 8,
-            completedModules: 2,
-            totalModules: 6,
-            daysRemaining: 3,
-            status: 'critical',
-            certificationIssues: ['Finance Certification overdue', 'Safety Training expired'],
-            complianceScore: 45,
-            lastActivity: '5 days ago',
-            hireDate: 'November 2023',
-            email: 'david.thompson@metrohyundai.com',
-            phone: '(555) 345-6789',
-            manager: 'Sarah Martinez',
-            territory: 'Suburban',
-            ytdSales: 89,
-            avgCustomerRating: 3.9,
-            certifications: [
-                { name: 'Product Knowledge', status: 'current', expiryDate: 'February 28, 2026' },
-                { name: 'Sales Fundamentals', status: 'current', expiryDate: 'March 15, 2026' },
-                { name: 'Finance & Insurance', status: 'overdue', expiryDate: 'July 15, 2025' },
-                { name: 'Safety Training', status: 'expired', expiryDate: 'July 17, 2025' }
-            ],
-            trainingModules: [
-                { id: 1, name: '2025 Hyundai Model Updates', status: 'completed', completedDate: 'July 8, 2025', score: 79, duration: "30 min" },
-                { id: 2, name: 'Digital Sales Tools', status: 'completed', completedDate: 'July 5, 2025', score: 82, duration: "45 min" },
-                { id: 3, name: 'Customer Retention Strategies', status: 'not_started', dueDate: 'July 31, 2025', duration: "60 min" },
-                { id: 4, name: 'Financing Options Deep Dive', status: 'not_started', dueDate: 'July 31, 2025', duration: "40 min" },
-                { id: 5, name: 'Competitive Analysis Workshop', status: 'not_started', dueDate: 'July 31, 2025', duration: "50 min" },
-                { id: 6, name: 'Q3 Sales Strategy Session', status: 'not_started', dueDate: 'July 31, 2025', duration: "35 min" }
-            ],
-            recentNudges: [
-                { type: 'critical', message: 'URGENT: Safety Training expired - complete immediately', sent: '3 hours ago' },
-                { type: 'urgent', message: 'Finance certification overdue - affects sales ability', sent: '1 day ago' },
-                { type: 'warning', message: '4 training modules overdue - STAR qualification at risk', sent: '2 days ago' }
-            ],
-            engagement: {
-                nudgeOpenRate: 32,
-                trainingCompletionRate: 33,
-                lastLogin: '5 days ago'
-            }
-        }
-    ]);
+  const behaviorAnalysis = [
+    { 
+      behavior: 'Completes training within 48hrs', 
+      impact: 92, 
+      correlation: 'High Performance',
+      topPerformerRate: 96,
+      avgPerformerRate: 67,
+      description: 'Quick training completion strongly correlates with sales success'
+    },
+    { 
+      behavior: 'Maintains 3+ active certifications', 
+      impact: 88, 
+      correlation: 'Sustained Excellence',
+      topPerformerRate: 94,
+      avgPerformerRate: 52,
+      description: 'Continuous certification maintenance indicates commitment to growth'
+    },
+    { 
+      behavior: 'Daily LMS engagement (>15min)', 
+      impact: 85, 
+      correlation: 'Future Star Potential',
+      topPerformerRate: 89,
+      avgPerformerRate: 45,
+      description: 'Consistent learning habits predict future performance improvements'
+    },
+    { 
+      behavior: 'Responds to nudges within 2hrs', 
+      impact: 76, 
+      correlation: 'High Engagement',
+      topPerformerRate: 91,
+      avgPerformerRate: 58,
+      description: 'Quick response to coaching indicates receptiveness to improvement'
+    },
+    { 
+      behavior: 'Takes optional/advanced modules', 
+      impact: 73, 
+      correlation: 'Growth Mindset',
+      topPerformerRate: 87,
+      avgPerformerRate: 34,
+      description: 'Self-directed learning strongly predicts career advancement'
+    },
+    { 
+      behavior: 'Receives 4.5+ manager feedback', 
+      impact: 81, 
+      correlation: 'Leadership Potential',
+      topPerformerRate: 93,
+      avgPerformerRate: 41,
+      description: 'Consistent positive feedback indicates strong soft skills'
+    }
+  ];
 
-    const [complianceAlerts] = useState([
-        {
-            id: 1,
-            type: 'expiring',
-            title: 'Certifications Expiring Soon',
-            count: 8,
-            priority: 'high',
-            details: '8 employees have certifications expiring within 14 days'
-        },
-        {
-            id: 2,
-            type: 'overdue',
-            title: 'Overdue Training',
-            count: 3,
-            priority: 'critical',
-            details: '3 employees have overdue mandatory training'
-        },
-        {
-            id: 3,
-            type: 'star_risk',
-            title: 'STAR Risk',
-            count: 5,
-            priority: 'high',
-            details: '5 employees at risk of losing STAR qualification'
-        }
-    ]);
+  const trainingRecommendations = [
+    {
+      persona: 'Potentials',
+      training: 'Advanced Negotiation & Closing Techniques',
+      priority: 'High',
+      estimatedImpact: '+15% close rate',
+      basedOn: ['Sarah Chen behavior patterns', 'Marcus Johnson training path'],
+      targetAudience: 'Sales Consultants with 85+ performance scores',
+      duration: '4 hours',
+      delivery: 'Interactive workshop + shadowing top performers'
+    },
+    {
+      persona: 'Absorbers',
+      training: 'Customer Engagement Mastery Program',
+      priority: 'Medium',
+      estimatedImpact: '+12% customer satisfaction',
+      basedOn: ['Lisa Rodriguez service approach', 'Top performer communication styles'],
+      targetAudience: 'Service Advisors with moderate engagement',
+      duration: '6 hours',
+      delivery: 'Role-play scenarios + peer mentoring'
+    },
+    {
+      persona: 'Disengaged',
+      training: 'Back to Basics + Manager Check-in Protocol',
+      priority: 'Critical',
+      estimatedImpact: 'Retention + 8% performance boost',
+      basedOn: ['Early warning indicators', 'Successful re-engagement cases'],
+      targetAudience: 'All roles with declining metrics',
+      duration: '2 hours + ongoing coaching',
+      delivery: 'One-on-one coaching + micro-learning modules'
+    }
+  ];
 
-    const getStarReward = (carsSold) => {
-        if (carsSold >= 17) return { rate: 175, total: carsSold * 175 };
-        if (carsSold >= 11) return { rate: 125, total: carsSold * 125 };
-        if (carsSold >= 6) return { rate: 75, total: carsSold * 75 };
-        return { rate: 0, total: 0 };
-    };
+  const regionalPerformance = [
+    { region: 'Central', performers: 18, potentials: 24, absorbers: 31, disengaged: 8, total: 81 },
+    { region: 'Eastern', performers: 22, potentials: 28, absorbers: 35, disengaged: 12, total: 97 },
+    { region: 'Mid-Atlantic', performers: 15, potentials: 32, absorbers: 28, disengaged: 6, total: 81 },
+    { region: 'Mountain States', performers: 12, potentials: 19, absorbers: 23, disengaged: 4, total: 58 },
+    { region: 'S Central', performers: 25, potentials: 31, absorbers: 38, disengaged: 9, total: 103 },
+    { region: 'Southern', performers: 28, potentials: 35, absorbers: 42, disengaged: 11, total: 116 },
+    { region: 'Western', performers: 17, potentials: 27, absorbers: 29, disengaged: 9, total: 82 }
+  ];
 
-    const getCurrentUser = () => {
-        if (viewMode === 'overview') {
-            return {
-                ...user,
-                newCarsSold: user.newCarsSold,
-                completedModules: user.completedModules,
-                totalModules: user.totalModules,
-                complianceScore: user.complianceScore,
-                lastActivity: user.lastActivity,
-                hireDate: user.hireDate,
-                email: user.email,
-                phone: user.phone,
-                manager: user.manager,
-                territory: user.territory,
-                ytdSales: user.ytdSales,
-                avgCustomerRating: user.avgCustomerRating,
-                certifications: user.certifications,
-                trainingModules: user.trainingModules,
-                recentNudges: user.recentNudges,
-                certificationIssues: user.certificationIssues,
-                engagement: user.engagement,
-            };
-        }
-        const member = teamMembers.find(member => member.id === selectedEmployee);
-        const currentTrainingModulesForSelected = member ? member.trainingModules : [];
-        const completed = currentTrainingModulesForSelected.filter(m => m.status === 'completed').length;
-        const total = currentTrainingModulesForSelected.length;
+  const keyCharacteristics = [
+    {
+      category: 'Learning Behavior',
+      characteristics: [
+        { trait: 'Training Completion Speed', topPerformer: 95, average: 67 },
+        { trait: 'Optional Module Participation', topPerformer: 87, average: 34 },
+        { trait: 'Knowledge Retention', topPerformer: 91, average: 72 },
+        { trait: 'Peer Teaching Frequency', topPerformer: 78, average: 23 }
+      ]
+    },
+    {
+      category: 'Engagement Patterns',
+      characteristics: [
+        { trait: 'Daily LMS Activity', topPerformer: 89, average: 45 },
+        { trait: 'Response to Coaching', topPerformer: 93, average: 58 },
+        { trait: 'Manager Interaction Quality', topPerformer: 88, average: 61 },
+        { trait: 'Team Collaboration', topPerformer: 85, average: 52 }
+      ]
+    },
+    {
+      category: 'Performance Indicators',
+      characteristics: [
+        { trait: 'Customer Satisfaction Scores', topPerformer: 92, average: 78 },
+        { trait: 'Process Adherence', topPerformer: 94, average: 71 },
+        { trait: 'Innovation/Improvement Ideas', topPerformer: 76, average: 29 },
+        { trait: 'Consistency Over Time', topPerformer: 90, average: 68 }
+      ]
+    }
+  ];
 
-        return {
-            ...user,
-            ...(member || {}),
-            completedModules: completed,
-            totalModules: total,
-            starQualified: completed === total && (member ? member.newCarsSold : 0) >= 6,
-            certifications: member?.certifications || [],
-            trainingModules: member?.trainingModules || [],
-            recentNudges: member?.recentNudges || [],
-            certificationIssues: member?.certificationIssues || [],
-            engagement: member?.engagement || {
-                nudgeOpenRate: 0,
-                trainingCompletionRate: 0,
-                lastLogin: 'N/A'
-            },
-            newCarsSold: member?.newCarsSold !== undefined ? member.newCarsSold : user.newCarsSold,
-        };
-    };
+  const predictiveFactors = [
+    { factor: 'Early Training Velocity', weight: 25, description: 'Speed of initial skill acquisition' },
+    { factor: 'Feedback Responsiveness', weight: 20, description: 'How quickly they implement coaching' },
+    { factor: 'Voluntary Learning Engagement', weight: 18, description: 'Self-directed skill development' },
+    { factor: 'Cross-functional Interest', weight: 15, description: 'Curiosity about other departments' },
+    { factor: 'Peer Collaboration Score', weight: 12, description: 'Quality of teamwork and mentoring' },
+    { factor: 'Customer Interaction Quality', weight: 10, description: 'Natural customer service aptitude' }
+  ];
 
-    const currentUser = getCurrentUser();
-    const starReward = getStarReward(currentUser.newCarsSold || 0);
-    const completionRate = currentUser.totalModules > 0 ? Math.round((currentUser.completedModules / currentUser.totalModules) * 100) : 0;
-
-    const handleViewEmployee = (employeeId) => {
-        setSelectedEmployee(employeeId);
-        setViewMode('individual');
-        setActiveTab('dashboard');
-    };
-
-    const handleBackToOverview = () => {
-        setViewMode('overview');
-        setActiveTab('overview');
-        setSelectedEmployee('self');
-    };
-
-    const updateModuleStatus = (employeeId, moduleId, newStatus, newProgress = 0, newCompletedDate = null, newScore = null) => {
-        setTeamMembers(prevMembers =>
-            prevMembers.map(member => {
-                if (member.id === employeeId) {
-                    const updatedTrainingModules = member.trainingModules.map(module => {
-                        if (module.id === moduleId) {
-                            let updatedModule = { ...module, status: newStatus };
-
-                            if (newStatus === 'in_progress') {
-                                updatedModule.progress = newProgress;
-                                if (!updatedModule.dueDate && module.dueDate) {
-                                    updatedModule.dueDate = module.dueDate;
-                                }
-                                delete updatedModule.completedDate;
-                                delete updatedModule.score;
-                            } else if (newStatus === 'completed') {
-                                updatedModule.completedDate = newCompletedDate;
-                                updatedModule.score = newScore || module.score;
-                                delete updatedModule.progress;
-                                delete updatedModule.dueDate;
-                            } else if (newStatus === 'not_started') {
-                                if (!updatedModule.dueDate && module.dueDate) {
-                                     updatedModule.dueDate = module.dueDate;
-                                }
-                                delete updatedModule.progress;
-                                delete updatedModule.completedDate;
-                                delete updatedModule.score;
-                            }
-
-                            return updatedModule;
-                        }
-                        return module;
-                    });
-
-                    const newCompletedCount = updatedTrainingModules.filter(m => m.status === 'completed').length;
-                    const newTotalCount = updatedTrainingModules.length;
-                    const newStarQualified = newCompletedCount === newTotalCount && member.newCarsSold >= 6;
-
-                    return {
-                        ...member,
-                        trainingModules: updatedTrainingModules,
-                        completedModules: newCompletedCount,
-                        totalModules: newTotalCount,
-                        starQualified: newStarQualified,
-                    };
-                }
-                return member;
-            })
-        );
-    };
-
-    const handleModuleStart = (moduleId) => {
-        updateModuleStatus(selectedEmployee, moduleId, 'in_progress', 10);
-    };
-
-    const handleModuleContinue = (moduleId) => {
-        const currentModule = currentUser.trainingModules?.find(m => m.id === moduleId);
-        if (currentModule && currentModule.progress) {
-            const newProgress = Math.min(currentModule.progress + 20, 100);
-            const newStatus = newProgress === 100 ? 'completed' : 'in_progress';
-            const newCompletedDate = newProgress === 100 ? new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : null;
-            const newScore = newProgress === 100 ? Math.floor(Math.random() * 15) + 85 : null;
-            updateModuleStatus(selectedEmployee, moduleId, newStatus, newProgress, newCompletedDate, newScore);
-        }
-    };
-
-    useEffect(() => {
-        const generateAINudges = () => {
-            const nudges = [
-                {
-                    id: 1,
-                    type: 'urgent',
-                    title: '🚨 Critical: 3 Employees Need Immediate Action',
-                    message: 'David Thompson has expired certifications and overdue training. Risk of compliance violation.',
-                    priority: 'critical',
-                    action: 'View Details',
-                    timestamp: new Date(Date.now() - 1000 * 60 * 15)
-                },
-                {
-                    id: 2,
-                    type: 'star_risk',
-                    title: '⭐ STAR Qualification Alert',
-                    message: '5 team members at risk of losing STAR qualification this month. Estimated impact: $15,750 in lost rewards.',
-                    priority: 'high',
-                    action: 'Send Nudges',
-                    timestamp: new Date(Date.now() - 1000 * 60 * 60)
-                }
-            ];
-            setNotifications(nudges);
-        };
-        generateAINudges();
-    }, []);
-
-    const getStatusColor = (status) => {
-        switch (status) {
-            case 'qualified': return 'border-green-200 bg-green-50';
-            case 'critical': return 'border-red-200 bg-red-50';
-            case 'at_risk': return 'border-orange-200 bg-orange-50';
-            case 'behind': return 'border-yellow-200 bg-yellow-50';
-            default: return 'border-gray-200 bg-gray-50';
-        }
-    };
-
-    const getStatusDot = (status) => {
-        switch (status) {
-            case 'qualified': return 'bg-green-500';
-            case 'critical': return 'bg-red-500';
-            case 'at_risk': return 'bg-orange-500';
-            case 'behind': return 'bg-yellow-500';
-            default: return 'bg-gray-500';
-        }
-    };
-
-    const getComplianceColor = (score) => {
-        if (score >= 90) return 'text-green-600';
-        if (score >= 70) return 'text-yellow-600';
-        return 'text-red-600';
-    };
-
-    const AlertCard = ({ alert }) => {
-        const getAlertColor = () => {
-            switch (alert.priority) {
-                case 'critical': return 'border-red-300 bg-red-50';
-                case 'high': return 'border-orange-300 bg-orange-50';
-                case 'medium': return 'border-yellow-300 bg-yellow-50';
-                default: return 'border-gray-300 bg-gray-50';
-            }
-        };
-
-        const getAlertIcon = () => {
-            switch (alert.type) {
-                case 'expiring': return <Clock className="w-5 h-5 text-orange-600" />;
-                case 'overdue': return <AlertTriangle className="w-5 h-5 text-red-600" />;
-                case 'star_risk': return <Star className="w-5 h-5 text-yellow-600" />;
-                default: return <Bell className="w-5 h-5 text-gray-600" />;
-            }
-        };
-
-        return (
-            <div className={`p-4 rounded-lg border ${getAlertColor()}`}>
-                <div className="flex items-start justify-between">
-                    <div className="flex items-center space-x-3">
-                        {getAlertIcon()}
-                        <div>
-                            <h4 className="font-semibold text-gray-900">{alert.title}</h4>
-                            <p className="text-sm text-gray-600 mt-1">{alert.details}</p>
-                        </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                        <span className={`text-2xl font-bold ${
-                            alert.priority === 'critical' ? 'text-red-600' :
-                                alert.priority === 'high' ? 'text-orange-600' :
-                                    'text-yellow-600'
-                        }`}>
-                            {alert.count}
-                        </span>
-                    </div>
-                </div>
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white shadow-sm border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center py-4">
+            <div className="flex items-center space-x-3">
+              <div className="bg-blue-600 p-2 rounded-lg">
+                <Brain className="w-6 h-6 text-white" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-gray-900">AI-Powered Top Performer Analysis</h1>
+                <p className="text-sm text-gray-600">Identify Excellence • Extract Insights • Uplift Performance</p>
+              </div>
             </div>
-        );
-    };
-
-    const TrainingModuleCard = ({ module, onStart, onContinue }) => {
-        const getModuleStatusColor = (status) => {
-            switch (status) {
-                case 'completed': return 'bg-green-50 border-green-200 text-green-800';
-                case 'in_progress': return 'bg-yellow-50 border-yellow-200 text-yellow-800';
-                case 'not_started': return 'bg-gray-50 border-gray-200 text-gray-800';
-                default: return 'bg-gray-50 border-gray-200 text-gray-800';
-            }
-        };
-
-        const getModuleStatusIcon = (status) => {
-            switch (status) {
-                case 'completed': return <CheckCircle className="w-5 h-5 text-green-600" />;
-                case 'in_progress': return <Clock className="w-5 h-5 text-yellow-600" />;
-                case 'not_started': return <BookOpen className="w-5 h-5 text-gray-600" />;
-                default: return <BookOpen className="w-5 h-5 text-gray-600" />;
-            }
-        };
-
-        return (
-            <div className={`p-4 rounded-lg border ${getModuleStatusColor(module.status)}`}>
-                <div className="flex items-start justify-between mb-3">
-                    <div className="flex items-center space-x-3">
-                        {getModuleStatusIcon(module.status)}
-                        <div>
-                            <h3 className="font-semibold">{module.name}</h3>
-                            <p className="text-sm opacity-75">{module.duration}</p>
-                        </div>
-                    </div>
-                    <div className="text-sm font-medium">
-                        {module.status === 'completed' && module.score && `Score: ${module.score}%`}
-                        {module.status === 'in_progress' && module.progress && `${module.progress}% Complete`}
-                        {module.status === 'not_started' && module.dueDate && `Due: ${module.dueDate}`}
-                    </div>
-                </div>
-                {module.status === 'in_progress' && module.progress && (
-                    <div className="w-full bg-white rounded-full h-2 mb-3">
-                        <div
-                            className="bg-yellow-600 h-2 rounded-full transition-all"
-                            style={{ width: `${module.progress}%` }}
-                        />
-                    </div>
-                )}
-                {module.status === 'not_started' && (
-                    <button
-                        onClick={() => onStart(module.id)}
-                        className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
-                    >
-                        Start Module
-                    </button>
-                )}
-                {module.status === 'in_progress' && (
-                    <button
-                        onClick={() => onContinue(module.id)}
-                        className="w-full bg-yellow-600 text-white py-2 px-4 rounded-md hover:bg-yellow-700 transition-colors"
-                    >
-                        Continue Learning ({module.progress}%)
-                    </button>
-                )}
-                {module.status === 'completed' && (
-                    <div className="flex items-center justify-between mt-2">
-                        <span className="text-sm text-green-700">
-                            Completed {module.completedDate}
-                        </span>
-                        <span className="text-xs bg-green-600 text-white px-2 py-1 rounded">COMPLETED</span>
-                    </div>
-                )}
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-2 bg-blue-50 px-3 py-2 rounded-lg">
+                <Zap className="w-4 h-4 text-blue-600" />
+                <span className="text-sm font-medium text-blue-800">87% Prediction Accuracy</span>
+              </div>
+              <button className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                <Download className="w-4 h-4" />
+                <span>Export Analysis</span>
+              </button>
             </div>
-        );
-    };
-
-    const handleDownloadReport = () => {
-        const reportContent = `
-Unified Learning Platform Report - ${new Date().toLocaleDateString()}
-
-Team Overview:
-STAR Qualified: ${teamMembers.filter(m => m.starQualified).length}
-Critical Issues: ${teamMembers.filter(m => m.status === 'critical').length}
-Avg Compliance: ${Math.round(teamMembers.reduce((acc, m) => acc + m.complianceScore, 0) / teamMembers.length)}%
-
-Team Member Details:
-${teamMembers.map(member => `
-  Name: ${member.name}
-  Role: ${member.role}
-  STAR Qualified: ${member.starQualified ? 'Yes' : 'No'}
-  New Cars Sold (Current Month): ${member.newCarsSold}
-  Completed Modules: ${member.completedModules}/${member.totalModules}
-  Compliance Score: ${member.complianceScore}%
-  Certification Issues: ${member.certificationIssues.length > 0 ? member.certificationIssues.join(', ') : 'None'}
-  Recent Nudges: ${member.recentNudges.map(n => n.message).join('; ') || 'None'}
-`).join('\n')}
-
-Compliance Alerts:
-${complianceAlerts.map(alert => `
-  Title: ${alert.title}
-  Details: ${alert.details}
-  Priority: ${alert.priority}
-`).join('\n')}
-        `;
-
-        const blob = new Blob([reportContent], { type: 'text/plain' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'Unified_Learning_Report.txt';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-    };
-
-    return (
-        <div className="max-w-7xl mx-auto p-6 bg-gray-50 min-h-screen">
-            {/* Header */}
-            <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
-                <div className="flex items-center justify-between">
-                    <div className="flex items-center space-x-4">
-                        <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                            <Shield className="w-6 h-6 text-white" />
-                        </div>
-                        <div>
-                            <h1 className="text-2xl font-bold text-gray-900">Unified Learning & Compliance Platform</h1>
-                            <p className="text-gray-600">
-                                {viewMode === 'overview' ? 'Manager Dashboard' : `${currentUser.name} • ${currentUser.role}`} • {user.dealership} • {user.region}
-                            </p>
-                        </div>
-                        {viewMode === 'individual' && (
-                            <button
-                                onClick={handleBackToOverview}
-                                className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
-                            >
-                                ← Back to Overview
-                            </button>
-                        )}
-                    </div>
-
-                    {viewMode === 'overview' && (
-                        <div className="flex items-center space-x-6">
-                            <div className="text-center">
-                                <div className="text-2xl font-bold text-green-600">
-                                    {teamMembers.filter(m => m.starQualified).length}
-                                </div>
-                                <p className="text-sm text-gray-600">STAR Qualified</p>
-                            </div>
-                            <div className="text-center">
-                                <div className="text-2xl font-bold text-red-600">
-                                    {teamMembers.filter(m => m.status === 'critical').length}
-                                </div>
-                                <p className="text-sm text-gray-600">Critical Issues</p>
-                            </div>
-                            <div className="text-center">
-                                <div className="text-2xl font-bold text-blue-600">
-                                    {Math.round(teamMembers.reduce((acc, m) => acc + m.complianceScore, 0) / teamMembers.length)}%
-                                </div>
-                                <p className="text-sm text-gray-600">Avg Compliance</p>
-                            </div>
-                        </div>
-                    )}
-                </div>
-            </div>
-
-            {/* Navigation */}
-            {viewMode === 'overview' && (
-                <div className="flex space-x-1 mb-6 bg-white rounded-lg p-1">
-                    {[
-                        { id: 'overview', label: 'Team Overview', icon: Users },
-                        { id: 'compliance', label: 'Compliance Alerts', icon: Shield },
-                        { id: 'reports', label: 'Reports & Analytics', icon: BarChart3 },
-                        { id: 'ai-nudge', label: 'AI Nudging', icon: Zap }
-                    ].map(tab => {
-                        const Icon = tab.icon;
-                        return (
-                            <button
-                                key={tab.id}
-                                onClick={() => setActiveTab(tab.id)}
-                                className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
-                                    activeTab === tab.id
-                                        ? 'bg-blue-100 text-blue-700'
-                                        : 'text-gray-600 hover:bg-gray-100'
-                                }`}
-                            >
-                                <Icon className="w-4 h-4" />
-                                <span>{tab.label}</span>
-                            </button>
-                        );
-                    })}
-                </div>
-            )}
-
-            {/* Individual Employee Navigation */}
-            {viewMode === 'individual' && (
-                <div className="flex space-x-1 mb-6 bg-white rounded-lg p-1">
-                    {[
-                        { id: 'dashboard', label: 'Employee Dashboard', icon: TrendingUp },
-                        { id: 'training', label: 'Training & Certifications', icon: BookOpen },
-                        { id: 'rewards', label: 'STAR Rewards', icon: Star }
-                    ].map(tab => {
-                        const Icon = tab.icon;
-                        return (
-                            <button
-                                key={tab.id}
-                                onClick={() => setActiveTab(tab.id)}
-                                className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
-                                    activeTab === tab.id
-                                        ? 'bg-blue-100 text-blue-700'
-                                        : 'text-gray-600 hover:bg-gray-100'
-                                }`}
-                            >
-                                <Icon className="w-4 h-4" />
-                                <span>{tab.label}</span>
-                            </button>
-                        );
-                    })}
-                </div>
-            )}
-
-            {/* Team Overview */}
-            {viewMode === 'overview' && activeTab === 'overview' && (
-                <div className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div className="bg-white p-6 rounded-xl shadow-sm">
-                            <div className="flex items-center space-x-3">
-                                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                                    <Target className="w-5 h-5 text-green-600" />
-                                </div>
-                                <div>
-                                    <div className="text-2xl font-bold text-green-600">87%</div>
-                                    <p className="text-sm text-gray-600">STAR Compliance</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="bg-white p-6 rounded-xl shadow-sm">
-                            <div className="flex items-center space-x-3">
-                                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                                    <BookOpen className="w-5 h-5 text-blue-600" />
-                                </div>
-                                <div>
-                                    <div className="text-2xl font-bold text-blue-600">23</div>
-                                    <p className="text-sm text-gray-600">Active Trainings</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="bg-white p-6 rounded-xl shadow-sm">
-                            <div className="flex items-center space-x-3">
-                                <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
-                                    <AlertCircle className="w-5 h-5 text-red-600" />
-                                </div>
-                                <div>
-                                    <div className="text-2xl font-bold text-red-600">11</div>
-                                    <p className="text-sm text-gray-600">Issues Detected</p>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="bg-white p-6 rounded-xl shadow-sm">
-                            <div className="flex items-center space-x-3">
-                                <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                                    <DollarSign className="w-5 h-5 text-purple-600" />
-                                </div>
-                                <div>
-                                    <div className="text-2xl font-bold text-purple-600">$47K</div>
-                                    <p className="text-sm text-gray-600">STAR Rewards at Risk</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                        <div className="flex items-center justify-between mb-6">
-                            <h2 className="text-xl font-bold text-gray-900">Team Members - {user.currentMonth}</h2>
-                            <div className="flex items-center space-x-3">
-                                <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2" onClick={handleDownloadReport}>
-                                    <Download className="w-4 h-4" />
-                                    <span>Export Report</span>
-                                </button>
-                                <button className="border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors flex items-center space-x-2">
-                                    <Zap className="w-4 h-4" />
-                                    <span>Send Nudges</span>
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className="grid grid-cols-1 gap-4">
-                            {teamMembers.map(member => {
-                                return (
-                                    <div
-                                        key={member.id}
-                                        className={`p-4 rounded-lg border-2 ${getStatusColor(member.status)}`}
-                                    >
-                                        <div className="flex items-center justify-between">
-                                            <div className="flex items-center space-x-4">
-                                                <div className={`w-3 h-3 rounded-full ${getStatusDot(member.status)}`}></div>
-                                                <div>
-                                                    <h3 className="font-semibold text-gray-900">{member.name}</h3>
-                                                    <div className="flex items-center space-x-4 text-sm text-gray-600">
-                                                        <span>{member.role}</span>
-                                                        {member.starQualified && (
-                                                            <span className="flex items-center space-x-1">
-                                                                <Star className="w-4 h-4 text-yellow-500" />
-                                                                <span>STAR Qualified</span>
-                                                            </span>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="flex items-center space-x-4">
-                                                <div className="text-right">
-                                                    <p className="text-sm text-gray-600">New Cars Sold</p>
-                                                    <p className="text-lg font-bold text-gray-900">{member.newCarsSold}</p>
-                                                </div>
-                                                <div className="text-right">
-                                                    <p className="text-sm text-gray-600">Training Completion</p>
-                                                    <p className="text-lg font-bold text-blue-600">{member.completedModules}/{member.totalModules}</p>
-                                                </div>
-                                                <button
-                                                    onClick={() => handleViewEmployee(member.id)}
-                                                    className="bg-blue-500 text-white px-3 py-1 rounded-md text-sm hover:bg-blue-600 transition-colors"
-                                                >
-                                                    View Profile
-                                                </button>
-                                            </div>
-                                        </div>
-                                        {member.certificationIssues && member.certificationIssues.length > 0 && (
-                                            <div className="mt-3 text-sm text-red-700 flex items-center space-x-2">
-                                                <AlertTriangle className="w-4 h-4" />
-                                                <span>Issues: {member.certificationIssues.join(', ')}</span>
-                                            </div>
-                                        )}
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Compliance Alerts Tab */}
-            {viewMode === 'overview' && activeTab === 'compliance' && (
-                <div className="space-y-6">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">Compliance Alerts</h2>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                        {complianceAlerts.map(alert => (
-                            <AlertCard key={alert.id} alert={alert} />
-                        ))}
-                    </div>
-
-                    <div className="bg-white rounded-xl shadow-sm p-6 mt-6">
-                        <h3 className="text-xl font-bold text-gray-900 mb-4">Detailed Compliance Status</h3>
-                        <div className="overflow-x-auto">
-                            <table className="min-w-full divide-y divide-gray-200">
-                                <thead className="bg-gray-50">
-                                    <tr>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee</th>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Compliance Score</th>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Certifications</th>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Overdue Training</th>
-                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Activity</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="bg-white divide-y divide-gray-200">
-                                    {teamMembers.map(member => (
-                                        <tr key={member.id}>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <div className="flex items-center">
-                                                    <div className="ml-4">
-                                                        <div className="text-sm font-medium text-gray-900">{member.name}</div>
-                                                        <div className="text-sm text-gray-500">{member.role}</div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap">
-                                                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                                                    member.complianceScore >= 90 ? 'bg-green-100 text-green-800' :
-                                                        member.complianceScore >= 70 ? 'bg-yellow-100 text-yellow-800' :
-                                                            'bg-red-100 text-red-800'
-                                                }`}>
-                                                    {member.complianceScore}%
-                                                </span>
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {member.certifications.filter(c => c.status !== 'current').map(c => (
-                                                    <div key={c.name} className={`flex items-center ${c.status === 'expired' ? 'text-red-600' : 'text-orange-600'}`}>
-                                                        <AlertTriangle className="w-4 h-4 mr-1" /> {c.name} ({c.status})
-                                                    </div>
-                                                ))}
-                                                {member.certifications.filter(c => c.status === 'current').length === member.certifications.length && 'All Current'}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {member.trainingModules.filter(m => m.status === 'not_started' && m.dueDate && new Date(m.dueDate) < new Date()).length > 0 ? (
-                                                    <span className="text-red-600 font-semibold">{member.trainingModules.filter(m => m.status === 'not_started' && m.dueDate && new Date(m.dueDate) < new Date()).length} Overdue</span>
-                                                ) : 'None'}
-                                            </td>
-                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                                {member.lastActivity}
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Reports & Analytics Tab */}
-            {viewMode === 'overview' && activeTab === 'reports' && (
-                <div className="space-y-6">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">Reports & Analytics</h2>
-
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                        <div className="flex justify-between items-center mb-4">
-                            <h3 className="text-xl font-semibold text-gray-900">Training & Performance Summary</h3>
-                            <button
-                                onClick={handleDownloadReport}
-                                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
-                            >
-                                <Download className="w-4 h-4" />
-                                <span>Download Full Report</span>
-                            </button>
-                        </div>
-                        <p className="text-gray-600 mb-4">
-                            Here you can find comprehensive reports on your team's training progress, certification status, sales performance, and engagement metrics.
-                        </p>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div className="border border-gray-200 p-4 rounded-md">
-                                <h4 className="font-medium text-gray-800 flex items-center gap-2 mb-2"><BarChart3 className="w-5 h-5" /> Overall Training Progress</h4>
-                                <p className="text-lg font-bold text-blue-600">
-                                    {Math.round(teamMembers.reduce((sum, member) => sum + (member.completedModules / member.totalModules || 0), 0) / teamMembers.length * 100) || 0}% Average
-                                </p>
-                                <p className="text-sm text-gray-500">Across all team members and modules.</p>
-                            </div>
-                            <div className="border border-gray-200 p-4 rounded-md">
-                                <h4 className="font-medium text-gray-800 flex items-center gap-2 mb-2"><Award className="w-5 h-5" /> Certification Compliance</h4>
-                                <p className="text-lg font-bold text-green-600">
-                                    {Math.round(teamMembers.filter(m => m.complianceScore === 100).length / teamMembers.length * 100) || 0}% Fully Compliant
-                                </p>
-                                <p className="text-sm text-gray-500">Percentage of team members with all certifications current.</p>
-                            </div>
-                            <div className="border border-gray-200 p-4 rounded-md">
-                                <h4 className="font-medium text-gray-800 flex items-center gap-2 mb-2"><DollarSign className="w-5 h-5" /> Potential STAR Rewards</h4>
-                                <p className="text-lg font-bold text-purple-600">
-                                    ${teamMembers.reduce((sum, member) => sum + getStarReward(member.newCarsSold).total, 0)}
-                                </p>
-                                <p className="text-sm text-gray-500">Total potential earnings from STAR program this month.</p>
-                            </div>
-                            <div className="border border-gray-200 p-4 rounded-md">
-                                <h4 className="font-medium text-gray-800 flex items-center gap-2 mb-2"><TrendingUp className="w-5 h-5" /> Top Performers (Sales)</h4>
-                                <ul className="list-disc list-inside text-sm text-gray-700">
-                                    {teamMembers.sort((a,b) => b.newCarsSold - a.newCarsSold).slice(0,3).map(member => (
-                                        <li key={member.id}>{member.name}: {member.newCarsSold} cars</li>
-                                    ))}
-                                </ul>
-                            </div>
-                        </div>
-                        <div className="mt-6 text-sm text-gray-500">
-                            *Note: This report provides a summary. Click "Download Full Report" for all detailed data.
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* AI Nudging Tab */}
-            {viewMode === 'overview' && activeTab === 'ai-nudge' && (
-                <div className="space-y-6">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">AI Nudging & Automation</h2>
-
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                        <h3 className="text-xl font-semibold text-gray-900 mb-4">Recent AI-Generated Nudges</h3>
-                        {notifications.length > 0 ? (
-                            <div className="grid grid-cols-1 gap-4">
-                                {notifications.map(nudge => (
-                                    <div key={nudge.id} className={`p-4 rounded-lg border ${
-                                        nudge.priority === 'critical' ? 'border-red-300 bg-red-50' :
-                                            nudge.priority === 'high' ? 'border-orange-300 bg-orange-50' :
-                                            'border-gray-300 bg-gray-50'
-                                    }`}>
-                                        <div className="flex items-start justify-between">
-                                            <div className="flex items-center space-x-3">
-                                                {nudge.type === 'urgent' && <AlertTriangle className="w-5 h-5 text-red-600" />}
-                                                {nudge.type === 'star_risk' && <Star className="w-5 h-5 text-yellow-600" />}
-                                                {nudge.type === 'congratulations' && <Award className="w-5 h-5 text-green-600" />}
-                                                {nudge.type === 'reminder' && <Bell className="w-5 h-5 text-blue-600" />}
-                                                <div>
-                                                    <h4 className="font-semibold text-gray-900">{nudge.title}</h4>
-                                                    <p className="text-sm text-gray-600 mt-1">{nudge.message}</p>
-                                                </div>
-                                            </div>
-                                            <div className="text-right text-sm text-gray-500">
-                                                <p>{nudge.timestamp.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })}</p>
-                                                {nudge.action && (
-                                                    <button className="mt-2 text-blue-600 hover:underline text-sm font-medium">
-                                                        {nudge.action}
-                                                    </button>
-                                                )}
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <p className="text-gray-500">No recent AI nudges to display.</p>
-                        )}
-                    </div>
-
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                        <h3 className="text-xl font-semibold text-gray-900 mb-4">Send a Custom Nudge</h3>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <label htmlFor="nudgeRecipient" className="block text-sm font-medium text-gray-700">Recipient</label>
-                                <select
-                                    id="nudgeRecipient"
-                                    name="nudgeRecipient"
-                                    className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
-                                    defaultValue="all"
-                                >
-                                    <option value="all">All Team Members</option>
-                                    {teamMembers.map(member => (
-                                        <option key={member.id} value={member.id}>{member.name}</option>
-                                    ))}
-                                </select>
-                            </div>
-                            <div>
-                                <label htmlFor="nudgeType" className="block text-sm font-medium text-gray-700">Nudge Type</label>
-                                <select
-                                    id="nudgeType"
-                                    name="nudgeType"
-                                    className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
-                                >
-                                    <option>Reminder</option>
-                                    <option>Urgent Action</option>
-                                    <option>Congratulations</option>
-                                    <option>Performance Tip</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div className="mt-4">
-                            <label htmlFor="nudgeMessage" className="block text-sm font-medium text-gray-700">Message</label>
-                            <textarea
-                                id="nudgeMessage"
-                                name="nudgeMessage"
-                                rows={3}
-                                className="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-                                placeholder="Type your nudge message here..."
-                            ></textarea>
-                        </div>
-                        <div className="mt-4 flex justify-end">
-                            <button className="bg-purple-600 text-white px-5 py-2 rounded-lg hover:bg-purple-700 transition-colors flex items-center space-x-2">
-                                <Mail className="w-4 h-4" />
-                                <span>Send Nudge</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Individual Employee Dashboard */}
-            {viewMode === 'individual' && activeTab === 'dashboard' && currentUser && (
-                <div className="space-y-6">
-                    {/* Employee Profile Card */}
-                    <div className="bg-white rounded-xl shadow-sm p-6">
-                        <div className="flex items-center space-x-6">
-                            <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-3xl font-bold">
-                                {currentUser.name?.charAt(0) || 'U'}
-                            </div>
-                            <div>
-                                <h2 className="text-2xl font-bold text-gray-900">{currentUser.name}</h2>
-                                <p className="text-gray-600">{currentUser.role} at {currentUser.dealership}</p>
-                                <div className="flex items-center space-x-3 text-sm text-gray-500 mt-2">
-                                    <Mail className="w-4 h-4" /> <span>{currentUser.email}</span>
-                                    <Smartphone className="w-4 h-4" /> <span>{currentUser.phone}</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="mt-6 border-t border-gray-200 pt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div>
-                                <p className="text-sm text-gray-500">Hire Date</p>
-                                <p className="font-medium text-gray-900">{currentUser.hireDate}</p>
-                            </div>
-                            <div>
-                                <p className="text-sm text-gray-500">Manager</p>
-                                <p className="font-medium text-gray-900">{currentUser.manager}</p>
-                            </div>
-                            <div>
-                                <p className="text-sm text-gray-500">Territory</p>
-                                <p className="font-medium text-gray-900">{currentUser.territory}</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Key Performance Indicators */}
-                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div className="bg-white p-6 rounded-xl shadow-sm flex items-center space-x-4">
-                            <DollarSign className="w-8 h-8 text-blue-600" />
-                            <div>
-                                <p className="text-sm text-gray-600">New Cars Sold (Current Month)</p>
-                                <p className="text-2xl font-bold text-gray-900">{currentUser.newCarsSold || 0}</p>
-                            </div>
-                        </div>
-                        <div className="bg-white p-6 rounded-xl shadow-sm flex items-center space-x-4">
-                            <BookOpen className="w-8 h-8 text-purple-600" />
-                            <div>
-                                <p className="text-sm text-gray-600">Training Completion</p>
-                                <p className="text-2xl font-bold text-gray-900">{completionRate}%</p>
-                            </div>
-                        </div>
-                        <div className="bg-white p-6 rounded-xl shadow-sm flex items-center space-x-4">
-                            <Shield className="w-8 h-8 text-green-600" />
-                            <div>
-                                <p className="text-sm text-gray-600">Compliance Score</p>
-                                <p className={`text-2xl font-bold ${getComplianceColor(currentUser.complianceScore || 0)}`}>{currentUser.complianceScore || 0}%</p>
-                            </div>
-                        </div>
-                        <div className="bg-white p-6 rounded-xl shadow-sm flex items-center space-x-4">
-                            <Trophy className="w-8 h-8 text-yellow-600" />
-                            <div>
-                                <p className="text-sm text-gray-600">STAR Qualified</p>
-                                <p className={`text-2xl font-bold ${currentUser.starQualified ? 'text-green-600' : 'text-red-600'}`}>
-                                    {currentUser.starQualified ? 'Yes' : 'No'}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Certifications and Training Summary */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="bg-white p-6 rounded-xl shadow-sm">
-                            <h3 className="text-xl font-bold text-gray-900 mb-4">Certifications</h3>
-                            <div className="space-y-3">
-                                {currentUser.certifications && currentUser.certifications.map(cert => (
-                                    <div key={cert.name} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
-                                        <div className="flex items-center space-x-3">
-                                            {cert.status === 'current' && <CheckCircle className="w-5 h-5 text-green-500" />}
-                                            {cert.status === 'expiring' && <Clock className="w-5 h-5 text-orange-500" />}
-                                            {cert.status === 'pending_renewal' && <AlertCircle className="w-5 h-5 text-yellow-500" />}
-                                            {cert.status === 'overdue' && <AlertTriangle className="w-5 h-5 text-red-500" />}
-                                            {cert.status === 'expired' && <AlertTriangle className="w-5 h-5 text-red-500" />}
-                                            <span className="font-medium text-gray-800">{cert.name}</span>
-                                        </div>
-                                        <span className={`text-sm font-semibold ${
-                                            cert.status === 'current' ? 'text-green-600' :
-                                                cert.status === 'expiring' ? 'text-orange-600' :
-                                                    cert.status === 'pending_renewal' ? 'text-yellow-600' :
-                                                        'text-red-600'
-                                        }`}>
-                                            {cert.status === 'current' ? 'Current' :
-                                            cert.status === 'expiring' ? `Expires ${new Date(cert.expiryDate).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})}` :
-                                            cert.status === 'pending_renewal' ? `Pending Renewal (${new Date(cert.expiryDate).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})})` :
-                                            `OVERDUE (${new Date(cert.expiryDate).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})})`}
-                                        </span>
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        <div className="bg-white p-6 rounded-xl shadow-sm">
-                            <h3 className="text-xl font-bold text-gray-900 mb-4">Training Modules</h3>
-                            <div className="space-y-4">
-                                {currentUser.trainingModules && currentUser.trainingModules.slice(0, 3).map(module => (
-                                    <TrainingModuleCard
-                                        key={module.id}
-                                        module={module}
-                                        onStart={handleModuleStart}
-                                        onContinue={handleModuleContinue}
-                                    />
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Recent Nudges and Engagement */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="bg-white p-6 rounded-xl shadow-sm">
-                            <h3 className="text-xl font-bold text-gray-900 mb-4">Recent Nudges Sent</h3>
-                            <div className="space-y-3">
-                                {currentUser.recentNudges && currentUser.recentNudges.length > 0 ? (
-                                    currentUser.recentNudges.map((nudge, index) => (
-                                        <div key={index} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-md border border-gray-200">
-                                            {nudge.type === 'critical' || nudge.type === 'urgent' || nudge.type === 'warning' ? (
-                                                <AlertTriangle className="w-5 h-5 text-red-500 mt-1" />
-                                            ) : (
-                                                <Bell className="w-5 h-5 text-blue-500 mt-1" />
-                                            )}
-                                            <div>
-                                                <p className="text-gray-800">{nudge.message}</p>
-                                                <p className="text-xs text-gray-500 mt-1">Sent: {nudge.sent}</p>
-                                            </div>
-                                        </div>
-                                    ))
-                                ) : (
-                                    <p className="text-gray-500 text-sm">No recent nudges for this employee.</p>
-                                )}
-                            </div>
-                        </div>
-
-                        <div className="bg-white p-6 rounded-xl shadow-sm">
-                            <h3 className="text-xl font-bold text-gray-900 mb-4">Engagement Metrics</h3>
-                            {currentUser.engagement ? (
-                                <div className="space-y-3 text-gray-700">
-                                    <div className="flex justify-between items-center">
-                                        <span className="flex items-center space-x-2"><Eye className="w-5 h-5 text-blue-500" /> <span>Nudge Open Rate:</span></span>
-                                        <span className="font-semibold">{currentUser.engagement.nudgeOpenRate}%</span>
-                                    </div>
-                                    <div className="flex justify-between items-center">
-                                        <span className="flex items-center space-x-2"><CheckCircle className="w-5 h-5 text-green-500" /> <span>Training Completion Rate:</span></span>
-                                        <span className="font-semibold">{currentUser.engagement.trainingCompletionRate}%</span>
-                                    </div>
-                                    <div className="flex justify-between items-center">
-                                        <span className="flex items-center space-x-2"><Clock className="w-5 h-5 text-gray-500" /> <span>Last Login:</span></span>
-                                        <span className="font-semibold">{currentUser.engagement.lastLogin}</span>
-                                    </div>
-                                </div>
-                            ) : (
-                                <p className="text-gray-500">No engagement data available.</p>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Individual Employee Training & Certifications */}
-            {viewMode === 'individual' && activeTab === 'training' && currentUser && (
-                <div className="space-y-6">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">Training & Certifications for {currentUser.name}</h2>
-
-                    <div className="bg-white p-6 rounded-xl shadow-sm">
-                        <h3 className="text-xl font-bold text-gray-900 mb-4">Current Certifications</h3>
-                        <div className="space-y-3">
-                            {currentUser.certifications && currentUser.certifications.length > 0 ? (
-                                currentUser.certifications.map(cert => (
-                                    <div key={cert.name} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
-                                        <div className="flex items-center space-x-3">
-                                            {cert.status === 'current' && <CheckCircle className="w-5 h-5 text-green-500" />}
-                                            {cert.status === 'expiring' && <Clock className="w-5 h-5 text-orange-500" />}
-                                            {cert.status === 'pending_renewal' && <AlertCircle className="w-5 h-5 text-yellow-500" />}
-                                            {cert.status === 'overdue' && <AlertTriangle className="w-5 h-5 text-red-500" />}
-                                            {cert.status === 'expired' && <AlertTriangle className="w-5 h-5 text-red-500" />}
-                                            <span className="font-medium text-gray-800">{cert.name}</span>
-                                        </div>
-                                        <span className={`text-sm font-semibold ${
-                                            cert.status === 'current' ? 'text-green-600' :
-                                                cert.status === 'expiring' ? 'text-orange-600' :
-                                                    cert.status === 'pending_renewal' ? 'text-yellow-600' :
-                                                        'text-red-600'
-                                        }`}>
-                                            {cert.status === 'current' ? 'Current' :
-                                            cert.status === 'expiring' ? `Expires ${new Date(cert.expiryDate).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})}` :
-                                            cert.status === 'pending_renewal' ? `Pending Renewal (${new Date(cert.expiryDate).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})})` :
-                                            `OVERDUE (${new Date(cert.expiryDate).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})})`}
-                                        </span>
-                                    </div>
-                                ))
-                            ) : (
-                                <p className="text-gray-500">No certifications listed.</p>
-                            )}
-                        </div>
-                    </div>
-
-                    <div className="bg-white p-6 rounded-xl shadow-sm">
-                        <h3 className="text-xl font-bold text-gray-900 mb-4">Assigned Training Modules</h3>
-                        <div className="space-y-4">
-                            {currentUser.trainingModules && currentUser.trainingModules.length > 0 ? (
-                                currentUser.trainingModules.map(module => (
-                                    <TrainingModuleCard
-                                        key={module.id}
-                                        module={module}
-                                        onStart={handleModuleStart}
-                                        onContinue={handleModuleContinue}
-                                    />
-                                ))
-                            ) : (
-                                <p className="text-gray-500">No training modules assigned.</p>
-                            )}
-                        </div>
-                    </div>
-                </div>
-            )}
-
-            {/* Individual Employee STAR Rewards */}
-            {viewMode === 'individual' && activeTab === 'rewards' && currentUser && (
-                <div className="space-y-6">
-                    <h2 className="text-2xl font-bold text-gray-900 mb-4">STAR Rewards for {currentUser.name}</h2>
-
-                    <div className="bg-white rounded-xl shadow-sm p-6 flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
-                            <Trophy className="w-12 h-12 text-yellow-600" />
-                            <div>
-                                <h3 className="text-xl font-bold text-gray-900">Current Month's STAR Performance</h3>
-                                <p className="text-gray-600">Sales close date: {user.salesCloseDate} ({user.daysRemaining} days remaining)</p>
-                            </div>
-                        </div>
-                        <div className="text-right">
-                            <p className="text-sm text-gray-600">New Cars Sold:</p>
-                            <p className="text-3xl font-bold text-blue-600">{currentUser.newCarsSold || 0}</p>
-                        </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div className="bg-white p-6 rounded-xl shadow-sm">
-                            <h3 className="text-xl font-bold text-gray-900 mb-4">STAR Qualification Status</h3>
-                            <div className="flex items-center space-x-3">
-                                {currentUser.starQualified ? (
-                                    <CheckCircle className="w-8 h-8 text-green-500" />
-                                ) : (
-                                    <AlertTriangle className="w-8 h-8 text-red-500" />
-                                )}
-                                <div>
-                                    <p className="text-lg font-semibold text-gray-900">
-                                        Status: <span className={currentUser.starQualified ? 'text-green-600' : 'text-red-600'}>
-                                            {currentUser.starQualified ? 'Qualified' : 'Not Qualified'}
-                                        </span>
-                                    </p>
-                                    <p className="text-sm text-gray-600">
-                                        {currentUser.starQualified ? "Great job! You've met all requirements for STAR qualification." : "Action required to achieve STAR qualification."}
-                                    </p>
-                                </div>
-                            </div>
-                            {!currentUser.starQualified && (
-                                <div className="mt-4 p-4 bg-red-50 border border-red-200 rounded-md text-red-800 text-sm">
-                                    <ul className="list-disc list-inside">
-                                        {currentUser.totalModules > 0 && currentUser.completedModules < currentUser.totalModules && (
-                                            <li>Complete remaining {currentUser.totalModules - currentUser.completedModules} training modules.</li>
-                                        )}
-                                        {(currentUser.newCarsSold || 0) < 6 && (
-                                            <li>Sell {6 - (currentUser.newCarsSold || 0)} more new cars.</li>
-                                        )}
-                                        {currentUser.certificationIssues && Array.isArray(currentUser.certificationIssues) && currentUser.certificationIssues.length > 0 && (
-                                            <li>Address certification issues: {currentUser.certificationIssues.join(', ')}.</li>
-                                        )}
-                                    </ul>
-                                </div>
-                            )}
-                        </div>
-
-                        <div className="bg-white p-6 rounded-xl shadow-sm">
-                            <h3 className="text-xl font-bold text-gray-900 mb-4">Estimated STAR Rewards</h3>
-                            <div className="flex items-center space-x-4">
-                                <DollarSign className="w-12 h-12 text-purple-600" />
-                                <div>
-                                    <p className="text-lg font-semibold text-gray-900">
-                                        Estimated Payout: <span className="text-purple-600">${starReward.total}</span>
-                                    </p>
-                                    <p className="text-sm text-gray-600">
-                                        Based on {currentUser.newCarsSold || 0} cars sold at ${starReward.rate} per car.
-                                    </p>
-                                </div>
-                            </div>
-                            <div className="mt-4 text-sm text-gray-700">
-                                <p><strong>STAR Reward Tiers:</strong></p>
-                                <ul className="list-disc list-inside mt-1">
-                                    <li>6-10 Cars: $75/car</li>
-                                    <li>11-16 Cars: $125/car</li>
-                                    <li>17+ Cars: $175/car</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+          </div>
         </div>
-    );
+      </div>
+
+      {/* Enhanced Filters */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div className="bg-white rounded-lg shadow-sm p-6 mb-6">
+          <div className="flex items-center space-x-2 mb-4">
+            <Search className="w-5 h-5 text-gray-600" />
+            <h3 className="text-lg font-semibold text-gray-900">Top Performer Analysis Filters</h3>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Region</label>
+              <select 
+                value={selectedRegion} 
+                onChange={(e) => setSelectedRegion(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                {regions.map(region => (
+                  <option key={region} value={region}>{region}</option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Role Category</label>
+              <select 
+                value={selectedRole} 
+                onChange={(e) => setSelectedRole(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option>All Roles</option>
+                <option>Sales Consultant</option>
+                <option>Sales Manager</option>
+                <option>Service Advisor</option>
+                <option>Technician</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Analysis Scope</label>
+              <select 
+                value={selectedThreshold} 
+                onChange={(e) => setSelectedThreshold(e.target.value)}
+                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option>Top 50</option>
+                <option>Top 25%</option>
+                <option>Top 10%</option>
+                <option>Top 100</option>
+              </select>
+            </div>
+            <div className="flex items-end">
+              <button className="w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors flex items-center justify-center space-x-2">
+                <Eye className="w-4 h-4" />
+                <span>Analyze Top Performers</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Navigation Tabs */}
+        <div className="bg-white rounded-lg shadow-sm mb-6">
+          <div className="border-b border-gray-200">
+            <nav className="flex space-x-8 px-6">
+              {[
+                { id: 'analysis', name: 'Top 50 Analysis', icon: Award },
+                { id: 'characteristics', name: 'Key Characteristics', icon: Brain },
+                { id: 'recommendations', name: 'Training Recommendations', icon: Target },
+                { id: 'predictions', name: 'Predictive Factors', icon: TrendingUp },
+                { id: 'regional', name: 'Regional Breakdown', icon: MapPin }
+              ].map(({ id, name, icon: Icon }) => (
+                <button
+                  key={id}
+                  onClick={() => setActiveTab(id)}
+                  className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm transition-colors ${
+                    activeTab === id
+                      ? 'border-blue-500 text-blue-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                >
+                  <Icon className="w-4 h-4" />
+                  <span>{name}</span>
+                </button>
+              ))}
+            </nav>
+          </div>
+        </div>
+
+        {/* Top 50 Analysis Tab */}
+        {activeTab === 'analysis' && (
+          <div className="space-y-6">
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">Top 50 Performers - {selectedRegion}</h3>
+                  <p className="text-sm text-gray-600">Comprehensive analysis beyond performance scores</p>
+                </div>
+                <div className="flex space-x-2">
+                  <button className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">
+                    Extract Characteristics
+                  </button>
+                  <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
+                    Generate Recommendations
+                  </button>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                {topPerformersData.map((performer, index) => (
+                  <div key={performer.name} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center space-x-4">
+                        <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-gold-400 to-gold-600 text-white font-bold rounded-full">
+                          {index + 1}
+                        </div>
+                        <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center text-white font-semibold">
+                          {performer.avatar}
+                        </div>
+                        <div>
+                          <h4 className="font-semibold text-gray-900">{performer.name}</h4>
+                          <p className="text-sm text-gray-600">{performer.role} • {performer.region}</p>
+                          <div className="flex items-center space-x-4 mt-1">
+                            <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded">
+                              {performer.experience} exp
+                            </span>
+                            <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                              {performer.certifications} certs
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center space-x-6">
+                        <div className="text-center">
+                          <p className="text-xl font-bold text-green-600">{performer.performanceScore}</p>
+                          <p className="text-xs text-gray-500">Performance</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-lg font-semibold text-blue-600">{performer.engagement}%</p>
+                          <p className="text-xs text-gray-500">Engagement</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-lg font-semibold text-purple-600">{performer.completionRate}%</p>
+                          <p className="text-xs text-gray-500">Training Complete</p>
+                        </div>
+                        <div className="text-center">
+                          <p className="text-lg font-semibold text-orange-600">{performer.managerFeedback}</p>
+                          <p className="text-xs text-gray-500">Manager Rating</p>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="mt-4 pt-4 border-t border-gray-100">
+                      <div className="flex justify-between items-center">
+                        <div>
+                          <p className="text-sm font-medium text-gray-700 mb-1">Key Strengths:</p>
+                          <div className="flex space-x-2">
+                            {performer.keyStrengths.map((strength, i) => (
+                              <span key={i} className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded">
+                                {strength}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="flex items-center space-x-2">
+                          <div className="text-center">
+                            <p className="text-sm font-semibold text-indigo-600">{performer.predictiveScore}</p>
+                            <p className="text-xs text-gray-500">Future Star Score</p>
+                          </div>
+                          <button className="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 transition-colors text-sm">
+                            View Full Profile
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Key Characteristics Tab */}
+        {activeTab === 'characteristics' && (
+          <div className="space-y-6">
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">Extracted Key Characteristics & Behaviors</h3>
+                  <p className="text-sm text-gray-600">AI-identified traits that differentiate top performers from average performers</p>
+                </div>
+                <div className="flex items-center space-x-2 bg-green-50 px-4 py-2 rounded-lg">
+                  <CheckCircle className="w-5 h-5 text-green-600" />
+                  <span className="text-sm font-medium text-green-800">Analysis Complete</span>
+                </div>
+              </div>
+
+              {keyCharacteristics.map((category, categoryIndex) => (
+                <div key={category.category} className="mb-8">
+                  <h4 className="text-lg font-semibold text-gray-800 mb-4">{category.category}</h4>
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    {category.characteristics.map((char, index) => (
+                      <div key={index} className="border border-gray-200 rounded-lg p-4">
+                        <div className="flex justify-between items-center mb-3">
+                          <h5 className="font-medium text-gray-900">{char.trait}</h5>
+                          <div className="text-right">
+                            <span className="text-lg font-bold text-green-600">{char.topPerformer}%</span>
+                            <span className="text-sm text-gray-500 ml-2">vs {char.average}%</span>
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-green-700">Top Performers</span>
+                            <span className="font-medium">{char.topPerformer}%</span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div className="bg-green-500 h-2 rounded-full" style={{width: `${char.topPerformer}%`}}></div>
+                          </div>
+                          <div className="flex items-center justify-between text-sm">
+                            <span className="text-gray-600">Average Performers</span>
+                            <span className="font-medium">{char.average}%</span>
+                          </div>
+                          <div className="w-full bg-gray-200 rounded-full h-2">
+                            <div className="bg-gray-400 h-2 rounded-full" style={{width: `${char.average}%`}}></div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-6">Behavioral Impact Analysis</h3>
+              <div className="space-y-4">
+                {behaviorAnalysis.map((behavior, index) => (
+                  <div key={index} className="border border-gray-200 rounded-lg p-4">
+                    <div className="flex justify-between items-start mb-3">
+                      <div className="flex-1">
+                        <h4 className="font-semibold text-gray-900">{behavior.behavior}</h4>
+                        <p className="text-sm text-gray-600 mt-1">{behavior.description}</p>
+                        <div className="flex items-center space-x-4 mt-2">
+                          <span className="text-xs bg-blue-100 text-blue-800 px-2 py-1 rounded">
+                            Top Performers: {behavior.topPerformerRate}%
+                          </span>
+                          <span className="text-xs bg-gray-100 text-gray-800 px-2 py-1 rounded">
+                            Average: {behavior.avgPerformerRate}%
+                          </span>
+                        </div>
+                      </div>
+                      <div className="text-right ml-4">
+                        <div className="text-2xl font-bold text-blue-600">{behavior.impact}%</div>
+                        <div className="text-xs text-gray-500">Impact Score</div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Training Recommendations Tab */}
+        {activeTab === 'recommendations' && (
+          <div className="space-y-6">
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">AI-Curated Training Recommendations</h3>
+                  <p className="text-sm text-gray-600">Based on top performer characteristics and behavioral analysis</p>
+                </div>
+                <button className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors">
+                  Deploy All Recommendations
+                </button>
+              </div>
+
+              <div className="space-y-6">
+                {trainingRecommendations.map((rec, index) => (
+                  <div key={index} className="border border-gray-200 rounded-lg p-6 bg-gradient-to-r from-blue-50 to-purple-50">
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="flex items-center space-x-3">
+                        <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                          rec.persona === 'Potentials' ? 'bg-blue-100 text-blue-800' :
+                          rec.persona === 'Absorbers' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-red-100 text-red-800'
+                        }`}>
+                          {rec.persona}
+                        </span>
+                        <span className={`px-2 py-1 rounded text-xs font-medium ${
+                          rec.priority === 'High' ? 'bg-orange-100 text-orange-800' :
+                          rec.priority === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-red-100 text-red-800'
+                        }`}>
+                          {rec.priority} Priority
+                        </span>
+                      </div>
+                      <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+                        Deploy Training
+                      </button>
+                    </div>
+
+                    <h4 className="text-xl font-bold text-gray-900 mb-2">{rec.training}</h4>
+                    <p className="text-lg text-green-600 font-semibold mb-4">Estimated Impact: {rec.estimatedImpact}</p>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                      <div>
+                        <h5 className="font-semibold text-gray-700 mb-2">Target Audience</h5>
+                        <p className="text-sm text-gray-600">{rec.targetAudience}</p>
+                      </div>
+                      <div>
+                        <h5 className="font-semibold text-gray-700 mb-2">Duration & Delivery</h5>
+                        <p className="text-sm text-gray-600">{rec.duration} • {rec.delivery}</p>
+                      </div>
+                    </div>
+
+                    <div className="bg-white rounded-lg p-4">
+                      <h5 className="font-semibold text-gray-700 mb-2">Based on Analysis of:</h5>
+                      <div className="flex flex-wrap gap-2">
+                        {rec.basedOn.map((source, i) => (
+                          <span key={i} className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded">
+                            {source}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Predictive Factors Tab */}
+        {activeTab === 'predictions' && (
+          <div className="space-y-6">
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <div className="flex justify-between items-center mb-6">
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">Early Performance Predictive Factors</h3>
+                  <p className="text-sm text-gray-600">AI model identifies who has potential to become top performers</p>
+                </div>
+                <div className="flex items-center space-x-2 bg-indigo-50 px-4 py-2 rounded-lg">
+                  <Star className="w-5 h-5 text-indigo-600" />
+                  <span className="text-sm font-medium text-indigo-800">87% Accuracy Rate</span>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="text-lg font-semibold text-gray-800 mb-4">Predictive Model Weights</h4>
+                  <div className="space-y-4">
+                    {predictiveFactors.map((factor, index) => (
+                      <div key={index} className="border border-gray-200 rounded-lg p-4">
+                        <div className="flex justify-between items-center mb-2">
+                          <h5 className="font-semibold text-gray-900">{factor.factor}</h5>
+                          <span className="text-lg font-bold text-blue-600">{factor.weight}%</span>
+                        </div>
+                        <p className="text-sm text-gray-600 mb-2">{factor.description}</p>
+                        <div className="w-full bg-gray-200 rounded-full h-2">
+                          <div className="bg-blue-500 h-2 rounded-full" style={{width: `${factor.weight * 4}%`}}></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-lg font-semibold text-gray-800 mb-4">Future Star Predictions</h4>
+                  <div className="space-y-4">
+                    {[
+                      { name: 'Alex Thompson', currentScore: 74, predictedScore: 89, timeline: '3-4 months', confidence: 87 },
+                      { name: 'Jordan Lee', currentScore: 71, predictedScore: 85, timeline: '4-5 months', confidence: 82 },
+                      { name: 'Casey Miller', currentScore: 68, predictedScore: 83, timeline: '5-6 months', confidence: 78 },
+                      { name: 'Riley Chang', currentScore: 76, predictedScore: 91, timeline: '2-3 months', confidence: 91 }
+                    ].map((prediction, index) => (
+                      <div key={index} className="border border-yellow-200 bg-yellow-50 rounded-lg p-4">
+                        <div className="flex justify-between items-center mb-2">
+                          <h5 className="font-semibold text-gray-900">{prediction.name}</h5>
+                          <div className="flex items-center space-x-2">
+                            <span className="text-sm bg-green-100 text-green-800 px-2 py-1 rounded">
+                              {prediction.confidence}% confidence
+                            </span>
+                          </div>
+                        </div>
+                        <div className="grid grid-cols-3 gap-4 text-sm">
+                          <div>
+                            <p className="text-gray-600">Current Score</p>
+                            <p className="font-semibold">{prediction.currentScore}</p>
+                          </div>
+                          <div>
+                            <p className="text-gray-600">Predicted Score</p>
+                            <p className="font-semibold text-green-600">{prediction.predictedScore}</p>
+                          </div>
+                          <div>
+                            <p className="text-gray-600">Timeline</p>
+                            <p className="font-semibold">{prediction.timeline}</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Regional Breakdown Tab */}
+        {activeTab === 'regional' && (
+          <div className="space-y-6">
+            <div className="bg-white rounded-lg shadow-sm p-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-6">Regional Performance Distribution</h3>
+              <div className="h-64 mb-6">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={regionalPerformance}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="region" />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="performers" stackId="a" fill="#10B981" />
+                    <Bar dataKey="potentials" stackId="a" fill="#3B82F6" />
+                    <Bar dataKey="absorbers" stackId="a" fill="#F59E0B" />
+                    <Bar dataKey="disengaged" stackId="a" fill="#EF4444" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div>
+                  <h4 className="text-lg font-semibold text-gray-800 mb-4">Regional Rankings by Top Performer %</h4>
+                  <div className="space-y-2">
+                    {regionalPerformance
+                      .map(region => ({
+                        ...region,
+                        performerRate: ((region.performers / region.total) * 100).toFixed(1)
+                      }))
+                      .sort((a, b) => parseFloat(b.performerRate) - parseFloat(a.performerRate))
+                      .map((region, index) => (
+                        <div key={region.region} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-8 h-8 bg-blue-100 text-blue-800 rounded-full flex items-center justify-center text-sm font-semibold">
+                              {index + 1}
+                            </div>
+                            <span className="font-medium text-gray-900">{region.region}</span>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-lg font-bold text-green-600">{region.performerRate}%</div>
+                            <div className="text-xs text-gray-500">{region.performers} of {region.total}</div>
+                          </div>
+                        </div>
+                      ))
+                    }
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-lg font-semibold text-gray-800 mb-4">Regional Improvement Opportunities</h4>
+                  <div className="space-y-4">
+                    {regionalPerformance
+                      .map(region => ({
+                        ...region,
+                        disengagedRate: ((region.disengaged / region.total) * 100).toFixed(1)
+                      }))
+                      .sort((a, b) => parseFloat(b.disengagedRate) - parseFloat(a.disengagedRate))
+                      .slice(0, 3)
+                      .map((region, index) => (
+                        <div key={region.region} className="border border-red-200 bg-red-50 rounded-lg p-4">
+                          <div className="flex justify-between items-center mb-2">
+                            <h5 className="font-semibold text-gray-900">{region.region}</h5>
+                            <span className="text-sm bg-red-100 text-red-800 px-2 py-1 rounded">
+                              Priority {index + 1}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-600 mb-2">
+                            {region.disengaged} disengaged employees ({region.disengagedRate}% of workforce)
+                          </p>
+                          <button className="bg-red-600 text-white px-3 py-2 rounded text-sm hover:bg-red-700 transition-colors">
+                            Deploy Intervention Program
+                          </button>
+                        </div>
+                      ))
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
 };
 
-export default UnifiedLearningPlatform;
+export default WorkforcePerformancePlatform;
