@@ -212,12 +212,13 @@ const AILearningApprovalWorkflow = () => {
         
         if (action === 'approve') {
           // Move to next stage in workflow
-          const nextStageIndex = item.workflowPath.findIndex((stage: any) => stage.status === 'in-progress') + 1;
-          const updatedWorkflowPath = item.workflowPath.map((stage: any, index: number) => {
+          const workflowPath = item.workflowPath as any[];
+          const nextStageIndex = workflowPath.findIndex(stage => stage.status === 'in-progress') + 1;
+          const updatedWorkflowPath = workflowPath.map((stage, index: number) => {
             if (index === nextStageIndex - 1) {
               return { ...stage, status: 'completed', completedAt: timestamp };
             }
-            if (index === nextStageIndex && nextStageIndex < item.workflowPath.length) {
+            if (index === nextStageIndex && nextStageIndex < workflowPath.length) {
               return { ...stage, status: 'in-progress', assignedAt: timestamp };
             }
             return stage;
@@ -253,7 +254,8 @@ const AILearningApprovalWorkflow = () => {
 
         } else if (action === 'reject') {
           // Create rejection entry
-          const currentStageInfo = item.workflowPath.find((stage: any) => stage.status === 'in-progress');
+          const workflowPath = item.workflowPath as any[];
+          const currentStageInfo = workflowPath.find(stage => stage.status === 'in-progress');
           const rejectionEntry = {
             stage: currentStageInfo?.stage || 'Unknown Stage',
             reviewer: 'Current User',
@@ -264,7 +266,7 @@ const AILearningApprovalWorkflow = () => {
           };
 
           // Update workflow path to show rejection
-          const updatedWorkflowPath = item.workflowPath.map((stage: any) => {
+          const updatedWorkflowPath = workflowPath.map(stage => {
             if (stage.status === 'in-progress') {
               return { ...stage, status: 'rejected', completedAt: timestamp };
             }
