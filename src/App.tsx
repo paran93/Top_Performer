@@ -123,7 +123,7 @@ const AILearningApprovalWorkflow = () => {
     },
   ]);
 
-  const getStatusColor = (status) => {
+  const getStatusColor = (status: string) => { // Added type annotation
     const colors = {
       'ai-generation': 'text-blue-600 bg-blue-100',
       'risk-analysis': 'text-purple-600 bg-purple-100',
@@ -138,7 +138,7 @@ const AILearningApprovalWorkflow = () => {
     return colors[status] || 'text-gray-600 bg-gray-100';
   };
 
-  const getRiskColor = (risk) => {
+  const getRiskColor = (risk: string) => { // Added type annotation
     const colors = {
       'low': 'text-green-600 bg-green-100',
       'medium': 'text-yellow-600 bg-yellow-100',
@@ -730,7 +730,7 @@ const AILearningApprovalWorkflow = () => {
       {activeTab === 'analytics' && (
         <div className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white rounded-lg shadow-sm border p-6">
+            <div className="bg-white p-4 rounded-lg shadow-sm border">
               <h3 className="text-lg font-semibold text-gray-800 mb-4">AI Model Performance</h3>
               <div className="space-y-3">
                 {[
