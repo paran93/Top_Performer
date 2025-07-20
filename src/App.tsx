@@ -1,1028 +1,1207 @@
-import React, { useState } from 'react';
-import { CheckCircle, XCircle, Clock, Eye, FileText, Users, AlertTriangle, Brain, BookOpen, Flag, Target, Layers, Database, GraduationCap, TrendingUp, Compass, RefreshCcw, Lightbulb } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { Star, BookOpen, Trophy, Bell, AlertTriangle, Calendar, DollarSign, Users, CheckCircle, Clock, Mail, Smartphone, TrendingUp, Eye, Download, UserCheck, AlertCircle, Target, BarChart3, Shield, Zap, FileText, Settings, Award } from 'lucide-react';
 
-const AILearningApprovalWorkflow = () => {
-  const [activeTab, setActiveTab] = useState('dashboard');
-  const [selectedItem, setSelectedItem] = useState<any>(null);
-  const [newPrompt, setNewPrompt] = useState('');
-  const [contentType, setContentType] = useState('lesson');
-  const [targetAudience, setTargetAudience] = useState('general');
-  const [rejectionComments, setRejectionComments] = useState('');
+const UnifiedLearningPlatform = () => {
+    const [user] = useState({
+        name: "Sarah Martinez",
+        role: "Sales Manager",
+        dealership: "Metro Hyundai",
+        region: "Southwest",
+        starQualified: true,
+        currentMonth: "July 2025",
+        salesCloseDate: "July 31, 2025, 11:59 PM PT",
+        daysRemaining: 3
+    });
 
-  const [contentItems, setContentItems] = useState([
-    {
-      id: 1,
-      title: "OEM Dealership Sales Onboarding: Product Knowledge",
-      type: "lesson",
-      status: "sme-review",
-      aiGenerated: true,
-      aiModel: "GPT-4",
-      modelVersion: "4.0.3",
-      prompt: "Develop an interactive module for new dealership sales staff on key OEM vehicle features, trim levels, and competitive advantages.",
-      confidenceScore: 0.94,
-      generatedAt: "2025-01-20 09:30",
-      submittedBy: "AI Content Generator",
-      currentReviewer: "Regional Sales Trainer",
-      riskLevel: "medium",
-      targetAudience: "new-hires",
-      contentPreview: "Welcome to your OEM Sales Journey! This module will equip you with essential product knowledge to confidently present our vehicles...",
-      flags: ["product-info", "sales-training"],
-      currentStage: 2,
-      totalStages: 6,
-      workflowPath: [
-        { stage: "AI Generation", status: "completed", reviewer: "AI System", completedAt: "2025-01-20 09:30" },
-        { stage: "Risk Analysis", status: "completed", reviewer: "Risk Scanner", completedAt: "2025-01-20 09:32" },
-        { stage: "SME Review", status: "in-progress", reviewer: "Regional Sales Trainer", assignedAt: "2025-01-20 09:34" },
-        { stage: "Legal Review", status: "pending", reviewer: "Legal Team", assignedAt: null },
-        { stage: "DEI Review", status: "pending", reviewer: "DEI Officer", assignedAt: null },
-        { stage: "Final Approval", status: "pending", reviewer: "Learning Director", assignedAt: null }
-      ],
-      rejectionHistory: [],
-      xapiEvents: [
-        { verb: "generated", timestamp: "2025-01-20 09:30", actor: "AI System" },
-        { verb: "documented", timestamp: "2025-01-20 09:31", actor: "Metadata Registry" },
-        { verb: "analyzed", timestamp: "2025-01-20 09:32", actor: "Risk Scanner" },
-        { verb: "submitted", timestamp: "2025-01-20 09:33", actor: "System" },
-        { verb: "assigned", timestamp: "2025-01-20 09:34", actor: "Workflow Engine" }
-      ]
-    },
-    {
-      id: 2,
-      title: "Advanced CRM Training for Corporate Sales",
-      type: "interactive",
-      status: "dei-review",
-      aiGenerated: true,
-      aiModel: "Claude Sonnet",
-      modelVersion: "3.5",
-      prompt: "Create an advanced training module for OEM corporate sales teams on leveraging CRM analytics for lead scoring and pipeline management.",
-      confidenceScore: 0.87,
-      generatedAt: "2025-01-19 14:15",
-      submittedBy: "AI Content Generator",
-      currentReviewer: "Corporate IT Lead",
-      riskLevel: "high",
-      targetAudience: "managers",
-      contentPreview: "Master our CRM to supercharge your sales pipeline. This training focuses on data-driven lead qualification and efficient opportunity management...",
-      flags: ["crm-training", "data-analytics"],
-      currentStage: 4,
-      totalStages: 6,
-      workflowPath: [
-        { stage: "AI Generation", status: "completed", reviewer: "AI System", completedAt: "2025-01-19 14:15" },
-        { stage: "Risk Analysis", status: "completed", reviewer: "Risk Scanner", completedAt: "2025-01-19 14:17" },
-        { stage: "SME Review", status: "completed", reviewer: "Sales Operations SME", completedAt: "2025-01-19 15:45" },
-        { stage: "Legal Review", status: "completed", reviewer: "Corporate Legal", completedAt: "2025-01-19 16:22" },
-        { stage: "DEI Review", status: "in-progress", reviewer: "Corporate IT Lead", assignedAt: "2025-01-19 16:25" },
-        { stage: "Final Approval", status: "pending", reviewer: "Learning Director", assignedAt: null }
-      ],
-      rejectionHistory: [],
-      xapiEvents: [
-        { verb: "generated", timestamp: "2025-01-19 14:15", actor: "AI System" },
-        { verb: "reviewed", timestamp: "2025-01-19 15:22", actor: "Sales Operations SME" },
-        { verb: "approved", timestamp: "2025-01-19 15:45", actor: "Sales Operations SME" },
-        { verb: "approved", timestamp: "2025-01-19 16:22", actor: "Corporate Legal" },
-        { verb: "assigned", timestamp: "2025-01-19 16:25", actor: "Workflow Engine" }
-      ]
-    },
-    {
-      id: 3,
-      title: "Dealership Service Bay Safety Protocol Quiz",
-      type: "assessment",
-      status: "published",
-      aiGenerated: true,
-      aiModel: "Gemini Pro",
-      modelVersion: "1.5",
-      prompt: "Design a mandatory quiz for dealership service technicians covering safety protocols for high-voltage vehicles and workshop equipment.",
-      confidenceScore: 0.96,
-      generatedAt: "2025-01-18 11:45",
-      submittedBy: "AI Content Generator",
-      currentReviewer: "Published",
-      riskLevel: "low",
-      targetAudience: "all-employees",
-      contentPreview: "Test your knowledge on essential service bay safety. This quiz covers critical procedures for electric vehicle handling, lift operations, and hazardous waste disposal...",
-      flags: ["assessment", "safety-training"],
-      approvedBy: "Full Review Chain",
-      publishedAt: "2025-01-18 16:30",
-      learnerViews: 247,
-      currentStage: 6,
-      totalStages: 6,
-      workflowPath: [
-        { stage: "AI Generation", status: "completed", reviewer: "AI System", completedAt: "2025-01-18 11:45" },
-        { stage: "Risk Analysis", status: "completed", reviewer: "Risk Scanner", completedAt: "2025-01-18 11:47" },
-        { stage: "SME Review", status: "completed", reviewer: "Dealership Safety Officer", completedAt: "2025-01-18 13:22" },
-        { stage: "Legal Review", status: "completed", reviewer: "OEM Legal Dept.", completedAt: "2025-01-18 14:15" },
-        { stage: "DEI Review", status: "skipped", reviewer: "N/A (Low Risk)", completedAt: "2025-01-18 14:15" },
-        { stage: "Final Approval", status: "completed", reviewer: "OEM Learning Director", completedAt: "2025-01-18 16:30" }
-      ],
-      rejectionHistory: [],
-      xapiEvents: [
-        { verb: "generated", timestamp: "2025-01-18 11:45", actor: "AI System" },
-        { verb: "reviewed", timestamp: "2025-01-18 13:22", actor: "Dealership Safety Officer" },
-        { verb: "approved", timestamp: "2025-01-18 14:15", actor: "OEM Legal Dept." },
-        { verb: "published", timestamp: "2025-01-18 16:30", actor: "LMS System" },
-        { verb: "experienced", timestamp: "2025-01-18 17:45", actor: "247 Dealership Learners" }
-      ]
-    },
-  ]);
+    const [activeTab, setActiveTab] = useState('overview');
+    const [selectedEmployee, setSelectedEmployee] = useState('self');
+    const [viewMode, setViewMode] = useState('overview');
+    const [notifications, setNotifications] = useState([]);
 
-  // Define a type for the allowed status keys
-  type StatusKey = 'ai-generation' | 'risk-analysis' | 'sme-review' | 'legal-review' | 'dei-review' | 'lxd-review' | 'final-approval' | 'published' | 'rejected';
-  
-  const getStatusColor = (status: string) => {
-    const colors: Record<string, string> = {
-      'ai-generation': 'text-blue-600 bg-blue-100',
-      'risk-analysis': 'text-purple-600 bg-purple-100',
-      'sme-review': 'text-yellow-600 bg-yellow-100',
-      'legal-review': 'text-orange-600 bg-orange-100',
-      'dei-review': 'text-indigo-600 bg-indigo-100',
-      'lxd-review': 'text-teal-600 bg-teal-100',
-      'final-approval': 'text-green-600 bg-green-100',
-      'published': 'text-green-700 bg-green-200',
-      'rejected': 'text-red-600 bg-red-100'
-    };
-    return colors[status] || 'text-gray-600 bg-gray-100';
-  };
-
-  // Define a type for the allowed risk keys
-  type RiskKey = 'low' | 'medium' | 'high';
-
-  const getRiskColor = (risk: string) => {
-    const colors: Record<string, string> = {
-      'low': 'text-green-600 bg-green-100',
-      'medium': 'text-yellow-600 bg-yellow-100',
-      'high': 'text-red-600 bg-red-100'
-    };
-    return colors[risk] || 'text-gray-600 bg-gray-100';
-  };
-
-  const generateAIContent = () => {
-    if (newPrompt.trim()) {
-      const newItem = {
-        id: Date.now(),
-        title: "AI Generated Learning Content",
-        type: contentType,
-        status: "ai-generation",
-        aiGenerated: true,
-        aiModel: "GPT-4",
-        modelVersion: "4.0.3",
-        prompt: newPrompt,
-        confidenceScore: Math.random() * 0.3 + 0.7,
-        generatedAt: new Date().toLocaleString(),
-        submittedBy: "AI Content Generator",
-        currentReviewer: "System Processing",
-        riskLevel: contentType === 'assessment' ? 'low' : targetAudience === 'managers' ? 'high' : 'medium',
-        targetAudience: targetAudience,
-        contentPreview: "AI is generating content based on your prompt...",
-        flags: [],
-        currentStage: 1,
-        totalStages: 6,
-        workflowPath: [
-          { stage: "AI Generation", status: "in-progress", reviewer: "AI System", assignedAt: new Date().toLocaleString() },
-          { stage: "Risk Analysis", status: "pending", reviewer: "Risk Scanner", assignedAt: null },
-          { stage: "SME Review", status: "pending", reviewer: "SME Team", assignedAt: null },
-          { stage: "Legal Review", status: "pending", reviewer: "Legal Team", assignedAt: null },
-          { stage: "DEI Review", status: "pending", reviewer: "DEI Officer", assignedAt: null },
-          { stage: "Final Approval", status: "pending", reviewer: "Learning Director", assignedAt: null }
-        ],
-        rejectionHistory: [],
-        xapiEvents: [
-          { verb: "generated", timestamp: new Date().toLocaleString(), actor: "AI System" }
-        ]
-      };
-      setContentItems(prev => [newItem, ...prev]);
-      setNewPrompt('');
-      
-      // Simulate AI generation process
-      setTimeout(() => {
-        setContentItems(prev => prev.map(item => 
-          item.id === newItem.id 
-            ? { ...item, status: 'risk-analysis', contentPreview: `Generated ${contentType} content based on prompt: "${newPrompt.substring(0, 50)}..."` }
-            : item
-        ));
-      }, 2000);
-    }
-  };
-
-  // Define types for action and comments
-  type ReviewAction = 'approve' | 'reject';
-
-  const handleReviewAction = (itemId: number, action: ReviewAction, comments: string = '') => {
-    setContentItems(prev => prev.map(item => {
-      if (item.id === itemId) {
-        const timestamp = new Date().toLocaleString();
-        let updatedItem = { ...item };
-        
-        if (action === 'approve') {
-          // Move to next stage in workflow
-          const workflowPath = item.workflowPath as any[];
-          const nextStageIndex = workflowPath.findIndex(stage => stage.status === 'in-progress') + 1;
-          const updatedWorkflowPath = workflowPath.map((stage, index: number) => {
-            if (index === nextStageIndex - 1) {
-              return { ...stage, status: 'completed', completedAt: timestamp };
+    const [teamMembers, setTeamMembers] = useState([
+        {
+            id: 'mike',
+            name: 'Mike Rodriguez',
+            role: 'Sales Consultant',
+            starQualified: false,
+            newCarsSold: 14,
+            completedModules: 4,
+            totalModules: 6,
+            daysRemaining: 3,
+            status: 'at_risk',
+            certificationIssues: ['Product Knowledge expires in 12 days'],
+            complianceScore: 75,
+            lastActivity: '2 days ago',
+            hireDate: 'March 2023',
+            email: 'mike.rodriguez@metrohyundai.com',
+            phone: '(555) 123-4567',
+            manager: 'Sarah Martinez',
+            territory: 'Downtown',
+            ytdSales: 156,
+            avgCustomerRating: 4.2,
+            certifications: [
+                { name: 'Product Knowledge', status: 'expiring', expiryDate: 'August 12, 2025' },
+                { name: 'Sales Fundamentals', status: 'current', expiryDate: 'December 15, 2025' },
+                { name: 'Finance & Insurance', status: 'current', expiryDate: 'October 8, 2025' },
+                { name: 'Customer Service Excellence', status: 'pending_renewal', expiryDate: 'August 1, 2025' }
+            ],
+            trainingModules: [
+                { id: 1, name: '2025 Hyundai Model Updates', status: 'completed', completedDate: 'July 18, 2025', score: 92, duration: "30 min" },
+                { id: 2, name: 'Digital Sales Tools', status: 'completed', completedDate: 'July 15, 2025', score: 88, duration: "45 min" },
+                { id: 3, name: 'Customer Retention Strategies', status: 'completed', completedDate: 'July 12, 2025', score: 95, duration: "60 min" },
+                { id: 4, name: 'Financing Options Deep Dive', status: 'completed', completedDate: 'July 10, 2025', score: 85, duration: "40 min" },
+                { id: 5, name: 'Competitive Analysis Workshop', status: 'in_progress', progress: 60, dueDate: 'July 30, 2025', duration: "50 min" },
+                { id: 6, name: 'Q3 Sales Strategy Session', status: 'not_started', dueDate: 'July 31, 2025', duration: "35 min" }
+            ],
+            recentNudges: [
+                { type: 'urgent', message: 'Complete Q3 Sales Strategy to maintain STAR qualification', sent: '2 hours ago' },
+                { type: 'reminder', message: 'Product Knowledge certification expires in 12 days', sent: '1 day ago' }
+            ],
+            engagement: {
+                nudgeOpenRate: 78,
+                trainingCompletionRate: 89,
+                lastLogin: '2 days ago'
             }
-            if (index === nextStageIndex && nextStageIndex < workflowPath.length) {
-              return { ...stage, status: 'in-progress', assignedAt: timestamp };
+        },
+        {
+            id: 'sarah',
+            name: 'Sarah Chen',
+            role: 'Sales Consultant',
+            starQualified: true,
+            newCarsSold: 18,
+            completedModules: 6,
+            totalModules: 6,
+            daysRemaining: 3,
+            status: 'qualified',
+            certificationIssues: [],
+            complianceScore: 100,
+            lastActivity: '1 day ago',
+            hireDate: 'January 2022',
+            email: 'sarah.chen@metrohyundai.com',
+            phone: '(555) 234-5678',
+            manager: 'Sarah Martinez',
+            territory: 'Midtown',
+            ytdSales: 198,
+            avgCustomerRating: 4.8,
+            certifications: [
+                { name: 'Product Knowledge', status: 'current', expiryDate: 'November 22, 2025' },
+                { name: 'Sales Fundamentals', status: 'current', expiryDate: 'January 10, 2026' },
+                { name: 'Finance & Insurance', status: 'current', expiryDate: 'September 18, 2025' },
+                { name: 'Customer Service Excellence', status: 'current', expiryDate: 'December 3, 2025' },
+                { name: 'Advanced Sales Techniques', status: 'current', expiryDate: 'October 15, 2025' }
+            ],
+            trainingModules: [
+                { id: 1, name: '2025 Hyundai Model Updates', status: 'completed', completedDate: 'July 20, 2025', score: 98, duration: "30 min" },
+                { id: 2, name: 'Digital Sales Tools', status: 'completed', completedDate: 'July 19, 2025', score: 94, duration: "45 min" },
+                { id: 3, name: 'Customer Retention Strategies', status: 'completed', completedDate: 'July 17, 2025', score: 96, duration: "60 min" },
+                { id: 4, name: 'Financing Options Deep Dive', status: 'completed', completedDate: 'July 16, 2025', score: 91, duration: "40 min" },
+                { id: 5, name: 'Competitive Analysis Workshop', status: 'completed', completedDate: 'July 14, 2025', score: 89, duration: "50 min" },
+                { id: 6, name: 'Q3 Sales Strategy Session', status: 'completed', completedDate: 'July 13, 2025', score: 93, duration: "35 min" }
+            ],
+            recentNudges: [
+                { type: 'congratulations', message: 'Excellent work! 100% STAR compliance achieved', sent: '1 day ago' },
+                { type: 'recognition', message: 'Top performer this month - 18 cars sold!', sent: '3 days ago' }
+            ],
+            engagement: {
+                nudgeOpenRate: 95,
+                trainingCompletionRate: 100,
+                lastLogin: '1 day ago'
             }
-            return stage;
-          });
-
-          // Determine new status and current reviewer
-          let newStatus = item.status;
-          let newReviewer = item.currentReviewer;
-          let newCurrentStage = item.currentStage;
-
-          // Fixed statusFlow with proper typing
-          const statusFlow: Record<string, { status: string; reviewer: string; stage: number }> = {
-            'sme-review': { status: 'legal-review', reviewer: 'Legal Team', stage: 3 },
-            'legal-review': { status: 'dei-review', reviewer: 'DEI Officer', stage: 4 },
-            'dei-review': { status: 'final-approval', reviewer: 'Learning Director', stage: 5 },
-            'final-approval': { status: 'published', reviewer: 'Published', stage: 6 }
-          };
-
-          const next = statusFlow[item.status];
-          if (next) {
-            newStatus = next.status;
-            newReviewer = next.reviewer;
-            newCurrentStage = next.stage;
-          }
-
-          updatedItem = {
-            ...updatedItem,
-            status: newStatus,
-            currentReviewer: newReviewer,
-            currentStage: newCurrentStage,
-            workflowPath: updatedWorkflowPath
-          };
-
-        } else if (action === 'reject') {
-          // Create rejection entry
-          const workflowPath = item.workflowPath as any[];
-          const currentStageInfo = workflowPath.find(stage => stage.status === 'in-progress');
-          const rejectionEntry = {
-            stage: currentStageInfo?.stage || 'Unknown Stage',
-            reviewer: 'Current User',
-            rejectedAt: timestamp,
-            reason: comments,
-            feedback: [],
-            severity: 'major'
-          };
-
-          // Update workflow path to show rejection
-          const updatedWorkflowPath = workflowPath.map(stage => {
-            if (stage.status === 'in-progress') {
-              return { ...stage, status: 'rejected', completedAt: timestamp };
+        },
+        {
+            id: 'david',
+            name: 'David Thompson',
+            role: 'Sales Consultant',
+            starQualified: false,
+            newCarsSold: 8,
+            completedModules: 2,
+            totalModules: 6,
+            daysRemaining: 3,
+            status: 'critical',
+            certificationIssues: ['Finance Certification overdue', 'Safety Training expired'],
+            complianceScore: 45,
+            lastActivity: '5 days ago',
+            hireDate: 'November 2023',
+            email: 'david.thompson@metrohyundai.com',
+            phone: '(555) 345-6789',
+            manager: 'Sarah Martinez',
+            territory: 'Suburban',
+            ytdSales: 89,
+            avgCustomerRating: 3.9,
+            certifications: [
+                { name: 'Product Knowledge', status: 'current', expiryDate: 'February 28, 2026' },
+                { name: 'Sales Fundamentals', status: 'current', expiryDate: 'March 15, 2026' },
+                { name: 'Finance & Insurance', status: 'overdue', expiryDate: 'July 15, 2025' },
+                { name: 'Safety Training', status: 'expired', expiryDate: 'July 17, 2025' }
+            ],
+            trainingModules: [
+                { id: 1, name: '2025 Hyundai Model Updates', status: 'completed', completedDate: 'July 8, 2025', score: 79, duration: "30 min" },
+                { id: 2, name: 'Digital Sales Tools', status: 'completed', completedDate: 'July 5, 2025', score: 82, duration: "45 min" },
+                { id: 3, name: 'Customer Retention Strategies', status: 'not_started', dueDate: 'July 31, 2025', duration: "60 min" },
+                { id: 4, name: 'Financing Options Deep Dive', status: 'not_started', dueDate: 'July 31, 2025', duration: "40 min" },
+                { id: 5, name: 'Competitive Analysis Workshop', status: 'not_started', dueDate: 'July 31, 2025', duration: "50 min" },
+                { id: 6, name: 'Q3 Sales Strategy Session', status: 'not_started', dueDate: 'July 31, 2025', duration: "35 min" }
+            ],
+            recentNudges: [
+                { type: 'critical', message: 'URGENT: Safety Training expired - complete immediately', sent: '3 hours ago' },
+                { type: 'urgent', message: 'Finance certification overdue - affects sales ability', sent: '1 day ago' },
+                { type: 'warning', message: '4 training modules overdue - STAR qualification at risk', sent: '2 days ago' }
+            ],
+            engagement: {
+                nudgeOpenRate: 32,
+                trainingCompletionRate: 33,
+                lastLogin: '5 days ago'
             }
-            if (stage.status === 'pending') {
-              return { ...stage, status: 'cancelled' };
-            }
-            return stage;
-          });
-
-          updatedItem = {
-            ...updatedItem,
-            status: 'rejected',
-            currentReviewer: `Rejected at ${currentStageInfo?.stage || 'Current Stage'}`,
-            workflowPath: updatedWorkflowPath,
-            rejectionHistory: [...(item.rejectionHistory || []), rejectionEntry]
-          };
         }
+    ]);
 
-        const newEvent = { 
-          verb: action === 'approve' ? 'approved' : 'rejected', 
-          timestamp, 
-          actor: 'Current User',
-          comments: comments || undefined
-        };
+    const [complianceAlerts] = useState([
+        {
+            id: 1,
+            type: 'expiring',
+            title: 'Certifications Expiring Soon',
+            count: 8,
+            priority: 'high',
+            details: '8 employees have certifications expiring within 14 days'
+        },
+        {
+            id: 2,
+            type: 'overdue',
+            title: 'Overdue Training',
+            count: 3,
+            priority: 'critical',
+            details: '3 employees have overdue mandatory training'
+        },
+        {
+            id: 3,
+            type: 'star_risk',
+            title: 'STAR Risk',
+            count: 5,
+            priority: 'high',
+            details: '5 employees at risk of losing STAR qualification'
+        }
+    ]);
+
+    // Calculate STAR rewards
+    const getStarReward = (carsSold) => {
+        if (carsSold >= 17) return { rate: 175, total: carsSold * 175 };
+        if (carsSold >= 11) return { rate: 125, total: carsSold * 125 };
+        if (carsSold >= 6) return { rate: 75, total: carsSold * 75 };
+        return { rate: 0, total: 0 };
+    };
+
+    const getCurrentUser = () => {
+        if (viewMode === 'overview') return user;
+        const member = teamMembers.find(member => member.id === selectedEmployee);
+        const currentTrainingModulesForSelected = member ? member.trainingModules : [];
+        const completed = currentTrainingModulesForSelected.filter(m => m.status === 'completed').length;
+        const total = currentTrainingModulesForSelected.length;
 
         return {
-          ...updatedItem,
-          xapiEvents: [...updatedItem.xapiEvents, newEvent]
+            ...user,
+            ...(member || {}),
+            completedModules: completed,
+            totalModules: total,
+            starQualified: completed === total && (member ? member.newCarsSold : 0) >= 6,
         };
-      }
-      return item;
-    }));
-    setSelectedItem(null);
-    setRejectionComments('');
-  };
+    };
 
-  const stats = {
-    total: contentItems.length,
-    inReview: contentItems.filter(item => !['published', 'rejected'].includes(item.status)).length,
-    published: contentItems.filter(item => item.status === 'published').length,
-    highRisk: contentItems.filter(item => item.riskLevel === 'high').length
-  };
+    const currentUser = getCurrentUser();
+    const starReward = getStarReward(currentUser.newCarsSold);
+    const completionRate = currentUser.totalModules > 0 ? Math.round((currentUser.completedModules / currentUser.totalModules) * 100) : 0;
 
-  // Mapping target audiences to their respective learning programs and AI features
-  const learningProgramsMap: Record<string, any> = {
-    "technical": {
-      title: "For Technical/Service Staff",
-      icon: <GraduationCap className="w-5 h-5 text-blue-600" />,
-      modules: [
-        "AR/VR-Based Machine Repair Simulations",
-        "Troubleshooting Smart Manufacturing Systems",
-        "Sensor Diagnostics and Predictive Maintenance",
-        "Robotics Programming Basics"
-      ],
-      aiFeatures: [
-        "Interactive fault-tree simulators",
-        "Smart hint system during simulations"
-      ]
-    },
-    "salesperson": {
-      title: "For Frontline Salesperson",
-      icon: <Users className="w-5 h-5 text-green-600" />,
-      modules: [
-        "Mobile Learning for Product Specs & Demos",
-        "Objection Handling for Competitive OEM Markets",
-        "AI-Assisted Quote Configurators"
-      ],
-      aiFeatures: [
-        "Chat-based roleplays for objection handling",
-        "Personalized pitch builders using AI"
-      ]
-    },
-    "l&d-designers": {
-      title: "For L&D / Designers",
-      icon: <Lightbulb className="w-5 h-5 text-purple-600" />,
-      modules: [
-        "Persona-Based Curriculum Templates",
-        "AI Content Co-Creation for Learning Modules",
-        "Best Practices for AI-Augmented Learning Design"
-      ],
-      aiFeatures: [
-        "Lesson auto-generator",
-        "Feedback loop from learner data"
-      ]
-    },
-    "managers": {
-      title: "For Performance Managers",
-      icon: <TrendingUp className="w-5 h-5 text-orange-600" />,
-      modules: [
-        "Using Compliance Dashboards",
-        "Diagnosing Underperformance via Learning Metrics",
-        "Coaching Conversations Based on AI Insights"
-      ],
-      aiFeatures: [
-        "Predictive analytics for team performance",
-        "Alerts on learner disengagement"
-      ]
-    },
-    "compliance-officers": {
-      title: "For Compliance Officers",
-      icon: <Flag className="w-5 h-5 text-red-600" />,
-      modules: [
-        "Mandatory Training (ISO, Safety, ESG)",
-        "Audit-Ready Learning Log Reviews",
-        "Regulatory Changes in OEM Compliance"
-      ],
-      aiFeatures: [
-        "Auto-flagging gaps in mandatory learning",
-        "Real-time compliance dashboards"
-      ]
-    },
-    "new-hires": {
-      title: "For New Corporate Employees",
-      icon: <BookOpen className="w-5 h-5 text-indigo-600" />,
-      modules: [
-        "OEM Onboarding Journeys",
-        "Systems & Process Familiarization (ERP, CRM, PLM)",
-        "Virtual Mentor Programs"
-      ],
-      aiFeatures: [
-        "Personalized onboarding roadmaps",
-        "AI-driven mentor matching"
-      ]
-    },
-    "career-oriented": {
-      title: "For Career-Oriented Learners",
-      icon: <Compass className="w-5 h-5 text-teal-600" />,
-      modules: [
-        "AI-Driven Career Planning",
-        "Internal Mobility Skills Pathways",
-        "Upskilling for Leadership in Manufacturing 4.0"
-      ],
-      aiFeatures: [
-        "Skill-gap analysis",
-        "Custom learning journeys"
-      ]
-    },
-    "re-training": {
-      title: "For Re-Training / Transitional Learners",
-      icon: <RefreshCcw className="w-5 h-5 text-yellow-600" />,
-      modules: [
-        "Support for Role Changes (e.g., factory to QA)",
-        "Microlearning for New Systems",
-        "Career Reskilling Roadmap"
-      ],
-      aiFeatures: [
-        "Career path suggestions",
-        "Role-matching based on completed training"
-      ]
-    },
-    "self-directed": {
-      title: "For Self-Directed Learners",
-      icon: <Eye className="w-5 h-5 text-gray-600" />,
-      modules: [
-        "Open Exploration Topics (e.g., AI in Manufacturing, Lean Principles)",
-        "Elective Skill Modules (e.g., CAD/CAM, PLC Programming)"
-      ],
-      aiFeatures: [
-        "Interest-based learning dashboard",
-        "Adaptive quiz and learning path recommendations"
-      ]
-    },
-    "general": {
-        title: "General Learning Programs",
-        icon: <BookOpen className="w-5 h-5 text-gray-600" />,
-        modules: ["General company policies", "Basic software usage", "Workplace safety"],
-        aiFeatures: ["General knowledge assessments", "Curated learning paths"]
-    },
-    "all-employees": {
-        title: "Programs for All Employees",
-        icon: <BookOpen className="w-5 h-5 text-gray-600" />,
-        modules: ["Mandatory annual compliance training", "Company culture and values", "Basic cybersecurity awareness"],
-        aiFeatures: ["Automated compliance tracking", "Personalized news feeds"]
-    }
-  };
+    const handleViewEmployee = (employeeId) => {
+        setSelectedEmployee(employeeId);
+        setViewMode('individual');
+        setActiveTab('dashboard');
+    };
 
-  return (
-    <div className="max-w-7xl mx-auto p-6 bg-gray-50 min-h-screen">
-      <div className="bg-white rounded-lg shadow-sm border mb-6">
-        <div className="px-6 py-4 border-b">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded flex items-center justify-center">
-              <Brain className="w-4 h-4 text-white" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-gray-800">AI Learning Content Approval System</h1>
-              <p className="text-sm text-gray-600">Enhanced workflow with xAPI integration and AI lifecycle tracking</p>
-            </div>
-          </div>
-        </div>
+    const handleBackToOverview = () => {
+        setViewMode('overview');
+        setActiveTab('overview');
+        setSelectedEmployee('self');
+    };
 
-        <div className="flex border-b overflow-x-auto">
-          {[
-            { id: 'dashboard', label: 'Dashboard', icon: <Layers className="w-4 h-4" /> },
-            { id: 'generate', label: 'AI Generation', icon: <Brain className="w-4 h-4" /> },
-            { id: 'xapi', label: 'xAPI Events', icon: <Database className="w-4 h-4" /> },
-            { id: 'analytics', label: 'Analytics', icon: <Target className="w-4 h-4" /> }
-          ].map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-3 font-medium flex items-center gap-2 whitespace-nowrap ${
-                activeTab === tab.id ? 'border-b-2 border-blue-600 text-blue-600' : 'text-gray-600'
-              }`}
-            >
-              {tab.icon}
-              {tab.label}
-            </button>
-          ))}
-        </div>
-      </div>
+    const updateModuleStatus = (employeeId, moduleId, newStatus, newProgress = 0, newCompletedDate = null, newScore = null) => {
+        setTeamMembers(prevMembers =>
+            prevMembers.map(member => {
+                if (member.id === employeeId) {
+                    const updatedTrainingModules = member.trainingModules.map(module => {
+                        if (module.id === moduleId) {
+                            return {
+                                ...module,
+                                status: newStatus,
+                                progress: newProgress,
+                                completedDate: newCompletedDate,
+                                score: newScore || module.score,
+                            };
+                        }
+                        return module;
+                    });
 
-      {activeTab === 'dashboard' && (
-        <div className="space-y-6">
-          {/* Enhanced Stats Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-white p-4 rounded-lg shadow-sm border">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Total Content</p>
-                  <p className="text-2xl font-bold text-gray-800">{stats.total}</p>
-                  <p className="text-xs text-green-600">AI-Generated</p>
-                </div>
-                <BookOpen className="w-8 h-8 text-gray-400" />
-              </div>
-            </div>
-            <div className="bg-white p-4 rounded-lg shadow-sm border">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">In Review</p>
-                  <p className="text-2xl font-bold text-yellow-600">{stats.inReview}</p>
-                  <p className="text-xs text-yellow-600">Active Workflow</p>
-                </div>
-                <Clock className="w-8 h-8 text-yellow-400" />
-              </div>
-            </div>
-            <div className="bg-white p-4 rounded-lg shadow-sm border">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">Published</p>
-                  <p className="text-2xl font-bold text-green-600">{stats.published}</p>
-                  <p className="text-xs text-green-600">Live for Learners</p>
-                </div>
-                <CheckCircle className="w-8 h-8 text-green-400" />
-              </div>
-            </div>
-            <div className="bg-white p-4 rounded-lg shadow-sm border">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm text-gray-600">High Risk</p>
-                  <p className="text-2xl font-bold text-red-600">{stats.highRisk}</p>
-                  <p className="text-xs text-red-600">Needs Extra Review</p>
-                </div>
-                <AlertTriangle className="w-8 h-8 text-red-400" />
-              </div>
-            </div>
-          </div>
+                    const newCompletedCount = updatedTrainingModules.filter(m => m.status === 'completed').length;
+                    const newTotalCount = updatedTrainingModules.length;
+                    const newStarQualified = newCompletedCount === newTotalCount && member.newCarsSold >= 6;
 
-          {/* Enhanced Content List */}
-          <div className="bg-white rounded-lg shadow-sm border">
-            <div className="px-6 py-4 border-b">
-              <h2 className="text-lg font-semibold text-gray-800">AI Content Approval Pipeline</h2>
-            </div>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Content & AI Details</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Risk Level</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Current Stage</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Reviewer</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Generated</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {contentItems.map((item) => (
-                    <tr key={item.id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4">
-                        <div className="flex items-start gap-3">
-                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
-                          <div className="flex-1">
-                            <p className="text-sm font-medium text-gray-800">{item.title}</p>
-                            <div className="flex items-center gap-4 mt-1 text-xs text-gray-500">
-                              <span className="flex items-center gap-1">
-                                <Brain className="w-3 h-3" />
-                                {item.aiModel} v{item.modelVersion}
-                              </span>
-                              <span>Confidence: {(item.confidenceScore * 100).toFixed(0)}%</span>
-                              <span className="capitalize">{item.type}</span>
-                            </div>
-                            {/* Progress Bar */}
-                            <div className="mt-2">
-                              <div className="flex items-center gap-2 text-xs text-gray-600">
-                                <span>Stage {item.currentStage}/{item.totalStages}</span>
-                                <div className="flex-1 bg-gray-200 rounded-full h-1.5">
-                                  <div 
-                                    className={`h-1.5 rounded-full transition-all duration-300 ${
-                                      item.status === 'rejected' ? 'bg-red-500' : 
-                                      item.status === 'published' ? 'bg-green-500' : 'bg-blue-500'
-                                    }`}
-                                    style={{ width: `${(item.currentStage / item.totalStages) * 100}%` }}
-                                  ></div>
-                                </div>
-                              </div>
-                            </div>
-                            {item.flags.length > 0 && (
-                              <div className="flex gap-1 mt-1">
-                                {item.flags.map((flag: string) => (
-                                  <span key={flag} className="px-1.5 py-0.5 bg-blue-100 text-blue-700 text-xs rounded">
-                                    {flag}
-                                  </span>
-                                ))}
-                              </div>
-                            )}
-                          </div>
+                    return {
+                        ...member,
+                        trainingModules: updatedTrainingModules,
+                        completedModules: newCompletedCount,
+                        totalModules: newTotalCount,
+                        starQualified: newStarQualified,
+                    };
+                }
+                return member;
+            })
+        );
+    };
+
+    const handleModuleStart = (moduleId) => {
+        updateModuleStatus(selectedEmployee, moduleId, 'in_progress', 10);
+    };
+
+    const handleModuleContinue = (moduleId) => {
+        const currentModule = currentUser.trainingModules.find(m => m.id === moduleId);
+        if (currentModule) {
+            const newProgress = Math.min(currentModule.progress + 20, 100);
+            const newStatus = newProgress === 100 ? 'completed' : 'in_progress';
+            const newCompletedDate = newProgress === 100 ? new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }) : currentModule.completedDate;
+            const newScore = newProgress === 100 ? Math.floor(Math.random() * 15) + 85 : null;
+            updateModuleStatus(selectedEmployee, moduleId, newStatus, newProgress, newCompletedDate, newScore);
+        }
+    };
+
+    useEffect(() => {
+        const generateAINudges = () => {
+            const nudges = [
+                {
+                    id: 1,
+                    type: 'urgent',
+                    title: '🚨 Critical: 3 Employees Need Immediate Action',
+                    message: 'David Thompson has expired certifications and overdue training. Risk of compliance violation.',
+                    priority: 'critical',
+                    action: 'View Details',
+                    timestamp: new Date(Date.now() - 1000 * 60 * 15)
+                },
+                {
+                    id: 2,
+                    type: 'star_risk',
+                    title: '⭐ STAR Qualification Alert',
+                    message: '5 team members at risk of losing STAR qualification this month. Estimated impact: $15,750 in lost rewards.',
+                    priority: 'high',
+                    action: 'Send Nudges',
+                    timestamp: new Date(Date.now() - 1000 * 60 * 60)
+                }
+            ];
+            setNotifications(nudges);
+        };
+        generateAINudges();
+    }, []);
+
+    const getStatusColor = (status) => {
+        switch (status) {
+            case 'qualified': return 'border-green-200 bg-green-50';
+            case 'critical': return 'border-red-200 bg-red-50';
+            case 'at_risk': return 'border-orange-200 bg-orange-50';
+            case 'behind': return 'border-yellow-200 bg-yellow-50';
+            default: return 'border-gray-200 bg-gray-50';
+        }
+    };
+
+    const getStatusDot = (status) => {
+        switch (status) {
+            case 'qualified': return 'bg-green-500';
+            case 'critical': return 'bg-red-500';
+            case 'at_risk': return 'bg-orange-500';
+            case 'behind': return 'bg-yellow-500';
+            default: return 'bg-gray-500';
+        }
+    };
+
+    const getComplianceColor = (score) => {
+        if (score >= 90) return 'text-green-600';
+        if (score >= 70) return 'text-yellow-600';
+        return 'text-red-600';
+    };
+
+    const AlertCard = ({ alert }) => {
+        const getAlertColor = () => {
+            switch (alert.priority) {
+                case 'critical': return 'border-red-300 bg-red-50';
+                case 'high': return 'border-orange-300 bg-orange-50';
+                case 'medium': return 'border-yellow-300 bg-yellow-50';
+                default: return 'border-gray-300 bg-gray-50';
+            }
+        };
+
+        const getAlertIcon = () => {
+            switch (alert.type) {
+                case 'expiring': return <Clock className="w-5 h-5 text-orange-600" />;
+                case 'overdue': return <AlertTriangle className="w-5 h-5 text-red-600" />;
+                case 'star_risk': return <Star className="w-5 h-5 text-yellow-600" />;
+                default: return <Bell className="w-5 h-5 text-gray-600" />;
+            }
+        };
+
+        return (
+            <div className={`p-4 rounded-lg border ${getAlertColor()}`}>
+                <div className="flex items-start justify-between">
+                    <div className="flex items-center space-x-3">
+                        {getAlertIcon()}
+                        <div>
+                            <h4 className="font-semibold text-gray-900">{alert.title}</h4>
+                            <p className="text-sm text-gray-600 mt-1">{alert.details}</p>
                         </div>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${getRiskColor(item.riskLevel)}`}>
-                          {item.riskLevel.toUpperCase()}
+                    </div>
+                    <div className="flex items-center space-x-2">
+                        <span className={`text-2xl font-bold ${
+                            alert.priority === 'critical' ? 'text-red-600' :
+                                alert.priority === 'high' ? 'text-orange-600' :
+                                    'text-yellow-600'
+                        }`}>
+                            {alert.count}
                         </span>
-                      </td>
-                      <td className="px-6 py-4">
-                        <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(item.status)}`}>
-                          {item.status.replace('-', ' ').replace(/\b\w/g, (l: string) => l.toUpperCase())}
-                        </span>
-                      </td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{item.currentReviewer}</td>
-                      <td className="px-6 py-4 text-sm text-gray-600">{item.generatedAt}</td>
-                      <td className="px-6 py-4">
-                        <button 
-                          onClick={() => setSelectedItem(item)}
-                          className="text-blue-600 hover:text-blue-800 text-sm font-medium"
-                        >
-                          Review
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {activeTab === 'generate' && (
-        <div className="bg-white rounded-lg shadow-sm border p-6">
-          <div className="flex items-center gap-3 mb-6">
-            <Brain className="w-6 h-6 text-blue-600" />
-            <h2 className="text-lg font-semibold text-gray-800">AI Content Generation</h2>
-          </div>
-          
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Content Type</label>
-                <select 
-                  value={contentType}
-                  onChange={(e) => setContentType(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="lesson">Interactive Lesson</option>
-                  <option value="assessment">Quiz/Assessment</option>
-                  <option value="simulation">Simulation</option>
-                  <option value="video-script">Video Script</option>
-                  <option value="job-aid">Job Aid/Reference</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Target Audience</label>
-                <select 
-                  value={targetAudience}
-                  onChange={(e) => setTargetAudience(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value="general">General Employees</option>
-                  <option value="new-hires">New Dealership Hires</option>
-                  <option value="managers">Dealership & Corporate Managers</option>
-                  <option value="leadership">OEM Leadership</option>
-                  <option value="technical">Technical & Service Staff</option>
-                  <option value="salesperson">Frontline Salesperson</option>
-                  <option value="l&d-designers">L&D / Designers</option>
-                  <option value="compliance-officers">Compliance Officers</option>
-                  <option value="career-oriented">Career-Oriented Learners</option>
-                  <option value="re-training">Re-Training / Transitional Learners</option>
-                  <option value="self-directed">Self-Directed Learners</option>
-                  <option value="all-employees">All OEM Corporate Employees</option>
-                </select>
-              </div>
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Learning Objective & Content Prompt</label>
-              <textarea 
-                value={newPrompt}
-                onChange={(e) => setNewPrompt(e.target.value)}
-                placeholder="Describe the learning objectives and content requirements. Be specific about skills, knowledge areas, and desired outcomes..."
-                className="w-full h-32 p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              />
-            </div>
-            
-            <div className="bg-blue-50 p-4 rounded-md">
-              <div className="flex items-start gap-3">
-                <Brain className="w-5 h-5 text-blue-600 mt-0.5" />
-                <div className="text-sm">
-                  <p className="text-blue-800 font-medium">AI Generation Process</p>
-                  <p className="text-blue-700 mt-1">Content will be generated → Risk analyzed → Routed for review → Tracked via xAPI</p>
+                    </div>
                 </div>
-              </div>
             </div>
-            
-            <button 
-              onClick={generateAIContent}
-              disabled={!newPrompt.trim()}
-              className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-md hover:from-blue-700 hover:to-purple-700 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
-            >
-              <Brain className="w-4 h-4" />
-              Generate AI Content
-            </button>
-          </div>
-        </div>
-      )}
+        );
+    };
 
-      {activeTab === 'xapi' && (
-        <div className="bg-white rounded-lg shadow-sm border">
-          <div className="px-6 py-4 border-b">
-            <div className="flex items-center gap-3">
-              <Database className="w-5 h-5 text-gray-600" />
-              <h2 className="text-lg font-semibold text-gray-800">xAPI Event Stream</h2>
-              <span className="text-sm text-gray-500">(Learning Record Store Integration)</span>
-            </div>
-          </div>
-          <div className="p-6">
-            <div className="space-y-4 max-h-96 overflow-y-auto">
-              {contentItems.flatMap(item => 
-                item.xapiEvents.map((event: any, index: number) => ({
-                  ...event,
-                  contentTitle: item.title,
-                  contentId: item.id,
-                  eventId: `${item.id}-${index}`
-                }))
-              )
-              .sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-              .map((event: any) => (
-                <div key={event.eventId} className="border-l-4 border-blue-200 pl-4 py-3 bg-gray-50 rounded-r">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <span className="px-2 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded uppercase">
-                        {event.verb}
-                      </span>
-                      <span className="text-sm font-medium text-gray-800">{event.contentTitle}</span>
-                    </div>
-                    <span className="text-xs text-gray-500">{event.timestamp}</span>
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    <span className="font-medium">Actor:</span> {event.actor}
-                    {event.comments && (
-                      <div className="mt-1">
-                        <span className="font-medium">Comments:</span> {event.comments}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
+    const TrainingModuleCard = ({ module, onStart, onContinue }) => {
+        const getModuleStatusColor = (status) => {
+            switch (status) {
+                case 'completed': return 'bg-green-50 border-green-200 text-green-800';
+                case 'in_progress': return 'bg-yellow-50 border-yellow-200 text-yellow-800';
+                case 'not_started': return 'bg-gray-50 border-gray-200 text-gray-800';
+                default: return 'bg-gray-50 border-gray-200 text-gray-800';
+            }
+        };
 
-      {activeTab === 'analytics' && (
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="bg-white p-4 rounded-lg shadow-sm border">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">AI Model Performance</h3>
-              <div className="space-y-3">
-                {[
-                  { model: 'GPT-4', version: '4.0.3', avgConfidence: 0.94, contentCount: 45 },
-                  { model: 'Claude Sonnet', version: '3.5', avgConfidence: 0.89, contentCount: 23 },
-                  { model: 'Gemini Pro', version: '1.5', avgConfidence: 0.92, contentCount: 31 }
-                ].map(model => (
-                  <div key={`${model.model}-${model.version}`} className="flex items-center justify-between p-3 bg-gray-50 rounded">
-                    <div>
-                      <p className="font-medium text-gray-800">{model.model} v{model.version}</p>
-                      <p className="text-sm text-gray-600">{model.contentCount} content items</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-lg font-bold text-green-600">{(model.avgConfidence * 100).toFixed(0)}%</p>
-                      <p className="text-xs text-gray-500">Avg Confidence</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            <div className="bg-white rounded-lg shadow-sm border p-6">
-              <h3 className="text-lg font-semibold text-gray-800 mb-4">Review Bottlenecks</h3>
-              <div className="space-y-3">
-                {[
-                  { stage: 'DEI Review', avgDays: 2.3, backlog: 8 },
-                  { stage: 'Legal Review', avgDays: 1.8, backlog: 3 },
-                  { stage: 'SME Review', avgDays: 1.2, backlog: 12 },
-                  { stage: 'LXD Review', avgDays: 0.9, backlog: 5 }
-                ].map(stage => (
-                  <div key={stage.stage} className="flex items-center justify-between p-3 bg-gray-50 rounded">
-                    <div>
-                      <p className="font-medium text-gray-800">{stage.stage}</p>
-                      <p className="text-sm text-gray-600">{stage.backlog} items in queue</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-lg font-bold text-yellow-600">{stage.avgDays}d</p>
-                      <p className="text-xs text-gray-500">Avg Review Time</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+        const getModuleStatusIcon = (status) => {
+            switch (status) {
+                case 'completed': return <CheckCircle className="w-5 h-5 text-green-600" />;
+                case 'in_progress': return <Clock className="w-5 h-5 text-yellow-600" />;
+                case 'not_started': return <BookOpen className="w-5 h-5 text-gray-600" />;
+                default: return <BookOpen className="w-5 h-5 text-gray-600" />;
+            }
+        };
 
-      {/* Enhanced Review Modal */}
-      {selectedItem && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="px-6 py-4 border-b">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <Brain className="w-5 h-5 text-blue-600" />
-                  <h3 className="text-lg font-semibold text-gray-800">AI Content Review</h3>
-                </div>
-                <button 
-                  onClick={() => {
-                    setSelectedItem(null);
-                    setRejectionComments('');
-                  }}
-                  className="text-gray-500 hover:text-gray-700"
-                >
-                  ✕
-                </button>
-              </div>
-            </div>
-            
-            <div className="p-6 space-y-6">
-              {/* AI Metadata */}
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <h4 className="font-medium text-blue-800 mb-3">AI Generation Details</h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                  <div>
-                    <span className="font-medium text-blue-700">Model:</span> {selectedItem.aiModel} v{selectedItem.modelVersion}
-                  </div>
-                  <div>
-                    <span className="font-medium text-blue-700">Confidence:</span> {(selectedItem.confidenceScore * 100).toFixed(0)}%
-                  </div>
-                  <div className="md:col-span-2">
-                    <span className="font-medium text-blue-700">Original Prompt:</span>
-                    <p className="mt-1 text-blue-800 italic">"{selectedItem.prompt}"</p>
-                  </div>
-                </div>
-              </div>
-
-              {/* Content Preview */}
-              <div>
-                <h4 className="font-medium text-gray-800 mb-3">Content Preview</h4>
-                <div className="bg-gray-50 p-4 rounded-md border">
-                  <h5 className="font-medium text-gray-700 mb-2">{selectedItem.title}</h5>
-                  <p className="text-sm text-gray-700">{selectedItem.contentPreview}</p>
-                </div>
-              </div>
-
-              {/* Associated Learning Program Details */}
-              {selectedItem.targetAudience && learningProgramsMap[selectedItem.targetAudience] && (
-                <div>
-                  <h4 className="font-medium text-gray-800 mb-3">Associated Learning Program Details</h4>
-                  <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 shadow-sm">
-                    <div className="flex items-center gap-3 mb-3">
-                      {learningProgramsMap[selectedItem.targetAudience].icon}
-                      <h3 className="text-md font-semibold text-gray-800">
-                        {learningProgramsMap[selectedItem.targetAudience].title}
-                      </h3>
-                    </div>
-                    <div className="mb-4">
-                      <p className="text-sm font-medium text-gray-700 mb-2">Modules:</p>
-                      <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
-                        {learningProgramsMap[selectedItem.targetAudience].modules.map((module: string, modIndex: number) => (
-                          <li key={modIndex}>{module}</li>
-                        ))}
-                      </ul>
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-gray-700 mb-2">AI Features:</p>
-                      <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
-                        {learningProgramsMap[selectedItem.targetAudience].aiFeatures.map((feature: string, featIndex: number) => (
-                          <li key={featIndex}>{feature}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Workflow Progress Visualization */}
-              <div>
-                <h4 className="font-medium text-gray-800 mb-3">Workflow Progress</h4>
-                <div className="space-y-2">
-                  {selectedItem.workflowPath.map((stage: any, index: number) => (
-                    <div key={index} className="flex items-center gap-3">
-                      <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-medium ${
-                        stage.status === 'completed' ? 'bg-green-500 text-white' :
-                        stage.status === 'in-progress' ? 'bg-blue-500 text-white' :
-                        stage.status === 'rejected' ? 'bg-red-500 text-white' :
-                        stage.status === 'cancelled' ? 'bg-gray-400 text-white' :
-                        stage.status === 'skipped' ? 'bg-yellow-500 text-white' :
-                        'bg-gray-200 text-gray-600'
-                      }`}>
-                        {index + 1}
-                      </div>
-                      <div className="flex-1">
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm font-medium text-gray-800">{stage.stage}</span>
-                          <span className={`text-xs px-2 py-1 rounded uppercase font-medium ${
-                            stage.status === 'completed' ? 'bg-green-100 text-green-700' :
-                            stage.status === 'in-progress' ? 'bg-blue-100 text-blue-700' :
-                            stage.status === 'rejected' ? 'bg-red-100 text-red-700' :
-                            stage.status === 'cancelled' ? 'bg-gray-100 text-gray-600' :
-                            stage.status === 'skipped' ? 'bg-yellow-100 text-yellow-700' :
-                            'bg-gray-50 text-gray-500'
-                          }`}>
-                            {stage.status}
-                          </span>
+        return (
+            <div className={`p-4 rounded-lg border ${getModuleStatusColor(module.status)}`}>
+                <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-center space-x-3">
+                        {getModuleStatusIcon(module.status)}
+                        <div>
+                            <h3 className="font-semibold">{module.name}</h3>
+                            <p className="text-sm opacity-75">{module.duration}</p>
                         </div>
-                        <div className="text-xs text-gray-600 mt-1">
-                          {stage.reviewer}
-                          {stage.completedAt && <span className="ml-2">• Completed: {stage.completedAt}</span>}
-                          {stage.assignedAt && stage.status === 'in-progress' && <span className="ml-2">• Assigned: {stage.assignedAt}</span>}
-                        </div>
-                      </div>
                     </div>
-                  ))}
+                    <div className="text-sm font-medium">
+                        {module.status === 'completed' && `Score: ${module.score}%`}
+                        {module.status === 'in_progress' && `${module.progress}% Complete`}
+                        {module.status === 'not_started' && `Due: ${module.dueDate}`}
+                    </div>
                 </div>
-              </div>
+                {module.status === 'in_progress' && (
+                    <div className="w-full bg-white rounded-full h-2 mb-3">
+                        <div
+                            className="bg-yellow-600 h-2 rounded-full transition-all"
+                            style={{ width: `${module.progress}%` }}
+                        />
+                    </div>
+                )}
+                {module.status === 'not_started' && (
+                    <button
+                        onClick={() => onStart(module.id)}
+                        className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors"
+                    >
+                        Start Module
+                    </button>
+                )}
+                {module.status === 'in_progress' && (
+                    <button
+                        onClick={() => onContinue(module.id)}
+                        className="w-full bg-yellow-600 text-white py-2 px-4 rounded-md hover:bg-yellow-700 transition-colors"
+                    >
+                        Continue Learning ({module.progress}%)
+                    </button>
+                )}
+                {module.status === 'completed' && (
+                    <div className="flex items-center justify-between mt-2">
+                        <span className="text-sm text-green-700">Completed {module.completedDate}</span>
+                        <span className="text-xs bg-green-600 text-white px-2 py-1 rounded">COMPLETED</span>
+                    </div>
+                )}
+            </div>
+        );
+    };
 
-              {/* Rejection History */}
-              {selectedItem.rejectionHistory && selectedItem.rejectionHistory.length > 0 && (
-                <div>
-                  <h4 className="font-medium text-gray-800 mb-3">Rejection History & Feedback</h4>
-                  <div className="space-y-4">
-                    {selectedItem.rejectionHistory.map((rejection: any, index: number) => (
-                      <div key={index} className="bg-red-50 border border-red-200 rounded-lg p-4">
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="flex items-center gap-2">
-                            <XCircle className="w-4 h-4 text-red-600" />
-                            <span className="text-sm font-medium text-red-800">{rejection.stage}</span>
-                            <span className={`px-2 py-1 rounded text-xs font-medium ${
-                              rejection.severity === 'major' ? 'bg-red-200 text-red-800' :
-                              rejection.severity === 'minor' ? 'bg-yellow-200 text-yellow-800' :
-                              'bg-gray-200 text-gray-800'
-                            }`}>
-                              {rejection.severity} Issues
-                            </span>
-                          </div>
-                          <span className="text-xs text-red-600">{rejection.rejectedAt}</span>
+    const handleDownloadReport = () => {
+        // In a real application, you would generate a more complex report
+        // and trigger a download. For this example, we'll create a simple text file.
+        const reportContent = `
+Unified Learning Platform Report - ${new Date().toLocaleDateString()}
+
+Team Overview:
+STAR Qualified: ${teamMembers.filter(m => m.starQualified).length}
+Critical Issues: ${teamMembers.filter(m => m.status === 'critical').length}
+Avg Compliance: ${Math.round(teamMembers.reduce((acc, m) => acc + m.complianceScore, 0) / teamMembers.length)}%
+
+Team Member Details:
+${teamMembers.map(member => `
+  Name: ${member.name}
+  Role: ${member.role}
+  STAR Qualified: ${member.starQualified ? 'Yes' : 'No'}
+  New Cars Sold (Current Month): ${member.newCarsSold}
+  Completed Modules: ${member.completedModules}/${member.totalModules}
+  Compliance Score: ${member.complianceScore}%
+  Certification Issues: ${member.certificationIssues.length > 0 ? member.certificationIssues.join(', ') : 'None'}
+  Recent Nudges: ${member.recentNudges.map(n => n.message).join('; ') || 'None'}
+`).join('\n')}
+
+Compliance Alerts:
+${complianceAlerts.map(alert => `
+  Title: ${alert.title}
+  Details: ${alert.details}
+  Priority: ${alert.priority}
+`).join('\n')}
+        `;
+
+        const blob = new Blob([reportContent], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'Unified_Learning_Report.txt';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    };
+
+    return (
+        <div className="max-w-7xl mx-auto p-6 bg-gray-50 min-h-screen">
+            {/* Header */}
+            <div className="bg-white rounded-xl shadow-sm p-6 mb-6">
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-4">
+                        <div className="w-12 h-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
+                            <Shield className="w-6 h-6 text-white" />
                         </div>
-                        <div className="text-sm text-red-700 mb-2">
-                          <strong>Reviewer:</strong> {rejection.reviewer}
+                        <div>
+                            <h1 className="text-2xl font-bold text-gray-900">Unified Learning & Compliance Platform</h1>
+                            <p className="text-gray-600">
+                                {viewMode === 'overview' ? 'Manager Dashboard' : `${currentUser.name} • ${currentUser.role}`} • {user.dealership} • {user.region}
+                            </p>
                         </div>
-                        <div className="text-sm text-red-800 mb-3">
-                          <strong>Reason:</strong> {rejection.reason}
-                        </div>
-                        {rejection.feedback && rejection.feedback.length > 0 && (
-                          <div>
-                            <p className="text-sm font-medium text-red-800 mb-2">Specific Feedback:</p>
-                            <ul className="list-disc list-inside text-sm text-red-700 space-y-1">
-                              {rejection.feedback.map((item: string, idx: number) => (
-                                <li key={idx}>{item}</li>
-                              ))}
-                            </ul>
-                          </div>
+                        {viewMode === 'individual' && (
+                            <button
+                                onClick={handleBackToOverview}
+                                className="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 transition-colors"
+                            >
+                                ← Back to Overview
+                            </button>
                         )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* xAPI History */}
-              <div>
-                <h4 className="font-medium text-gray-800 mb-3">Review History (xAPI Events)</h4>
-                <div className="space-y-2 max-h-32 overflow-y-auto">
-                  {selectedItem.xapiEvents.map((event: any, index: number) => (
-                    <div key={index} className="flex items-center gap-3 text-sm">
-                      <span className="px-2 py-1 bg-gray-100 text-gray-700 rounded text-xs uppercase font-medium">
-                        {event.verb}
-                      </span>
-                      <span className="text-gray-600">{event.actor}</span>
-                      <span className="text-gray-500 text-xs">{event.timestamp}</span>
                     </div>
-                  ))}
-                </div>
-              </div>
 
-              {/* Risk Assessment */}
-              <div>
-                <h4 className="font-medium text-gray-800 mb-3">Risk Assessment</h4>
-                <div className="flex items-center gap-4">
-                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${getRiskColor(selectedItem.riskLevel)}`}>
-                    {selectedItem.riskLevel.toUpperCase()} RISK
-                  </span>
-                  <span className="text-sm text-gray-600">Target: {selectedItem.targetAudience.replace('-', ' ')}</span>
+                    {viewMode === 'overview' && (
+                        <div className="flex items-center space-x-6">
+                            <div className="text-center">
+                                <div className="text-2xl font-bold text-green-600">
+                                    {teamMembers.filter(m => m.starQualified).length}
+                                </div>
+                                <p className="text-sm text-gray-600">STAR Qualified</p>
+                            </div>
+                            <div className="text-center">
+                                <div className="text-2xl font-bold text-red-600">
+                                    {teamMembers.filter(m => m.status === 'critical').length}
+                                </div>
+                                <p className="text-sm text-gray-600">Critical Issues</p>
+                            </div>
+                            <div className="text-center">
+                                <div className="text-2xl font-bold text-blue-600">
+                                    {Math.round(teamMembers.reduce((acc, m) => acc + m.complianceScore, 0) / teamMembers.length)}%
+                                </div>
+                                <p className="text-sm text-gray-600">Avg Compliance</p>
+                            </div>
+                        </div>
+                    )}
                 </div>
-              </div>
-
-              {/* Review Actions */}
-              {!['published', 'rejected'].includes(selectedItem.status) && (
-                <div className="flex flex-col gap-3 pt-4 border-t">
-                  {/* Rejection Comments Textarea */}
-                  <div className="w-full">
-                    <label htmlFor="rejectionComments" className="block text-sm font-medium text-gray-700 mb-2">
-                      Rejection Reason & Feedback:
-                    </label>
-                    <textarea
-                      id="rejectionComments"
-                      value={rejectionComments}
-                      onChange={(e) => setRejectionComments(e.target.value)}
-                      placeholder="Provide detailed reasons for rejection and suggestions for improvement..."
-                      rows={4}
-                      className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500"
-                    ></textarea>
-                  </div>
-
-                  <div className="flex gap-3">
-                    <button 
-                      onClick={() => handleReviewAction(selectedItem.id, 'approve')}
-                      className="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 flex items-center gap-2"
-                    >
-                      <CheckCircle className="w-4 h-4" />
-                      Approve & Forward
-                    </button>
-                    <button 
-                      onClick={() => handleReviewAction(selectedItem.id, 'reject', rejectionComments)}
-                      disabled={!rejectionComments.trim()}
-                      className="bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed flex items-center gap-2"
-                    >
-                      <XCircle className="w-4 h-4" />
-                      Reject with Detailed Feedback
-                    </button>
-                  </div>
-                </div>
-              )}
             </div>
-          </div>
+
+            {/* Navigation */}
+            {viewMode === 'overview' && (
+                <div className="flex space-x-1 mb-6 bg-white rounded-lg p-1">
+                    {[
+                        { id: 'overview', label: 'Team Overview', icon: Users },
+                        { id: 'compliance', label: 'Compliance Alerts', icon: Shield },
+                        { id: 'reports', label: 'Reports & Analytics', icon: BarChart3 }, // New tab
+                        { id: 'ai-nudge', label: 'AI Nudging', icon: Zap } // New tab
+                    ].map(tab => {
+                        const Icon = tab.icon;
+                        return (
+                            <button
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id)}
+                                className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
+                                    activeTab === tab.id
+                                        ? 'bg-blue-100 text-blue-700'
+                                        : 'text-gray-600 hover:bg-gray-100'
+                                }`}
+                            >
+                                <Icon className="w-4 h-4" />
+                                <span>{tab.label}</span>
+                            </button>
+                        );
+                    })}
+                </div>
+            )}
+
+            {/* Individual Employee Navigation */}
+            {viewMode === 'individual' && (
+                <div className="flex space-x-1 mb-6 bg-white rounded-lg p-1">
+                    {[
+                        { id: 'dashboard', label: 'Employee Dashboard', icon: TrendingUp },
+                        { id: 'training', label: 'Training & Certifications', icon: BookOpen },
+                        { id: 'rewards', label: 'STAR Rewards', icon: Star }
+                    ].map(tab => {
+                        const Icon = tab.icon;
+                        return (
+                            <button
+                                key={tab.id}
+                                onClick={() => setActiveTab(tab.id)}
+                                className={`flex items-center space-x-2 px-4 py-2 rounded-md transition-colors ${
+                                    activeTab === tab.id
+                                        ? 'bg-blue-100 text-blue-700'
+                                        : 'text-gray-600 hover:bg-gray-100'
+                                }`}
+                            >
+                                <Icon className="w-4 h-4" />
+                                <span>{tab.label}</span>
+                            </button>
+                        );
+                    })}
+                </div>
+            )}
+
+            {/* Team Overview */}
+            {viewMode === 'overview' && activeTab === 'overview' && (
+                <div className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div className="bg-white p-6 rounded-xl shadow-sm">
+                            <div className="flex items-center space-x-3">
+                                <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
+                                    <Target className="w-5 h-5 text-green-600" />
+                                </div>
+                                <div>
+                                    <div className="text-2xl font-bold text-green-600">87%</div>
+                                    <p className="text-sm text-gray-600">STAR Compliance</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="bg-white p-6 rounded-xl shadow-sm">
+                            <div className="flex items-center space-x-3">
+                                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                                    <BookOpen className="w-5 h-5 text-blue-600" />
+                                </div>
+                                <div>
+                                    <div className="text-2xl font-bold text-blue-600">23</div>
+                                    <p className="text-sm text-gray-600">Active Trainings</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="bg-white p-6 rounded-xl shadow-sm">
+                            <div className="flex items-center space-x-3">
+                                <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
+                                    <AlertCircle className="w-5 h-5 text-red-600" />
+                                </div>
+                                <div>
+                                    <div className="text-2xl font-bold text-red-600">11</div>
+                                    <p className="text-sm text-gray-600">Issues Detected</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="bg-white p-6 rounded-xl shadow-sm">
+                            <div className="flex items-center space-x-3">
+                                <div className="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                                    <DollarSign className="w-5 h-5 text-purple-600" />
+                                </div>
+                                <div>
+                                    <div className="text-2xl font-bold text-purple-600">$47K</div>
+                                    <p className="text-sm text-gray-600">STAR Rewards at Risk</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-white rounded-xl shadow-sm p-6">
+                        <div className="flex items-center justify-between mb-6">
+                            <h2 className="text-xl font-bold text-gray-900">Team Members - {user.currentMonth}</h2>
+                            <div className="flex items-center space-x-3">
+                                <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2" onClick={handleDownloadReport}>
+                                    <Download className="w-4 h-4" />
+                                    <span>Export Report</span>
+                                </button>
+                                <button className="border border-gray-300 px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors flex items-center space-x-2">
+                                    <Zap className="w-4 h-4" />
+                                    <span>Send Nudges</span>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 gap-4">
+                            {teamMembers.map(member => {
+                                const memberStarReward = getStarReward(member.newCarsSold);
+                                return (
+                                    <div
+                                        key={member.id}
+                                        className={`p-4 rounded-lg border-2 ${getStatusColor(member.status)}`}
+                                    >
+                                        <div className="flex items-center justify-between">
+                                            <div className="flex items-center space-x-4">
+                                                <div className={`w-3 h-3 rounded-full ${getStatusDot(member.status)}`}></div>
+                                                <div>
+                                                    <h3 className="font-semibold text-gray-900">{member.name}</h3>
+                                                    <div className="flex items-center space-x-4 text-sm text-gray-600">
+                                                        <span>{member.role}</span>
+                                                        {member.starQualified && (
+                                                            <span className="flex items-center space-x-1">
+                                                                <Star className="w-4 h-4 text-yellow-500" />
+                                                                <span>STAR Qualified</span>
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="flex items-center space-x-4">
+                                                <div className="text-right">
+                                                    <p className="text-sm text-gray-600">New Cars Sold</p>
+                                                    <p className="text-lg font-bold text-gray-900">{member.newCarsSold}</p>
+                                                </div>
+                                                <div className="text-right">
+                                                    <p className="text-sm text-gray-600">Training Completion</p>
+                                                    <p className="text-lg font-bold text-blue-600">{member.completedModules}/{member.totalModules}</p>
+                                                </div>
+                                                <button
+                                                    onClick={() => handleViewEmployee(member.id)}
+                                                    className="bg-blue-500 text-white px-3 py-1 rounded-md text-sm hover:bg-blue-600 transition-colors"
+                                                >
+                                                    View Profile
+                                                </button>
+                                            </div>
+                                        </div>
+                                        {member.certificationIssues && member.certificationIssues.length > 0 && (
+                                            <div className="mt-3 text-sm text-red-700 flex items-center space-x-2">
+                                                <AlertTriangle className="w-4 h-4" />
+                                                <span>Issues: {member.certificationIssues.join(', ')}</span>
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Compliance Alerts Tab */}
+            {viewMode === 'overview' && activeTab === 'compliance' && (
+                <div className="space-y-6">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4">Compliance Alerts</h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        {complianceAlerts.map(alert => (
+                            <AlertCard key={alert.id} alert={alert} />
+                        ))}
+                    </div>
+
+                    <div className="bg-white rounded-xl shadow-sm p-6 mt-6">
+                        <h3 className="text-xl font-bold text-gray-900 mb-4">Detailed Compliance Status</h3>
+                        <div className="overflow-x-auto">
+                            <table className="min-w-full divide-y divide-gray-200">
+                                <thead className="bg-gray-50">
+                                    <tr>
+                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Employee</th>
+                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Compliance Score</th>
+                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Certifications</th>
+                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Overdue Training</th>
+                                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Activity</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="bg-white divide-y divide-gray-200">
+                                    {teamMembers.map(member => (
+                                        <tr key={member.id}>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <div className="flex items-center">
+                                                    <div className="ml-4">
+                                                        <div className="text-sm font-medium text-gray-900">{member.name}</div>
+                                                        <div className="text-sm text-gray-500">{member.role}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap">
+                                                <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                                                    member.complianceScore >= 90 ? 'bg-green-100 text-green-800' :
+                                                    member.complianceScore >= 70 ? 'bg-yellow-100 text-yellow-800' :
+                                                    'bg-red-100 text-red-800'
+                                                }`}>
+                                                    {member.complianceScore}%
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                {member.certifications.filter(c => c.status !== 'current').map(c => (
+                                                    <div key={c.name} className={`flex items-center ${c.status === 'expired' ? 'text-red-600' : 'text-orange-600'}`}>
+                                                        <AlertTriangle className="w-4 h-4 mr-1" /> {c.name} ({c.status})
+                                                    </div>
+                                                ))}
+                                                {member.certifications.filter(c => c.status === 'current').length === member.certifications.length && 'All Current'}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                {member.trainingModules.filter(m => m.status === 'not_started' && new Date(m.dueDate) < new Date()).length > 0 ? (
+                                                    <span className="text-red-600 font-semibold">{member.trainingModules.filter(m => m.status === 'not_started' && new Date(m.dueDate) < new Date()).length} Overdue</span>
+                                                ) : 'None'}
+                                            </td>
+                                            <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                                                {member.lastActivity}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Reports & Analytics Tab (New) */}
+            {viewMode === 'overview' && activeTab === 'reports' && (
+                <div className="space-y-6">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4">Reports & Analytics</h2>
+
+                    <div className="bg-white rounded-xl shadow-sm p-6">
+                        <div className="flex justify-between items-center mb-4">
+                            <h3 className="text-xl font-semibold text-gray-900">Training & Performance Summary</h3>
+                            <button
+                                onClick={handleDownloadReport}
+                                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
+                            >
+                                <Download className="w-4 h-4" />
+                                <span>Download Full Report</span>
+                            </button>
+                        </div>
+                        <p className="text-gray-600 mb-4">
+                            Here you can find comprehensive reports on your team's training progress, certification status, sales performance, and engagement metrics.
+                        </p>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div className="border border-gray-200 p-4 rounded-md">
+                                <h4 className="font-medium text-gray-800 flex items-center gap-2 mb-2"><BarChart3 className="w-5 h-5" /> Overall Training Progress</h4>
+                                <p className="text-lg font-bold text-blue-600">
+                                    {Math.round(teamMembers.reduce((sum, member) => sum + (member.completedModules / member.totalModules || 0), 0) / teamMembers.length * 100) || 0}% Average
+                                </p>
+                                <p className="text-sm text-gray-500">Across all team members and modules.</p>
+                            </div>
+                            <div className="border border-gray-200 p-4 rounded-md">
+                                <h4 className="font-medium text-gray-800 flex items-center gap-2 mb-2"><Award className="w-5 h-5" /> Certification Compliance</h4>
+                                <p className="text-lg font-bold text-green-600">
+                                    {Math.round(teamMembers.filter(m => m.complianceScore === 100).length / teamMembers.length * 100) || 0}% Fully Compliant
+                                </p>
+                                <p className="text-sm text-gray-500">Percentage of team members with all certifications current.</p>
+                            </div>
+                            <div className="border border-gray-200 p-4 rounded-md">
+                                <h4 className="font-medium text-gray-800 flex items-center gap-2 mb-2"><DollarSign className="w-5 h-5" /> Potential STAR Rewards</h4>
+                                <p className="text-lg font-bold text-purple-600">
+                                    ${teamMembers.reduce((sum, member) => sum + getStarReward(member.newCarsSold).total, 0)}
+                                </p>
+                                <p className="text-sm text-gray-500">Total potential earnings from STAR program this month.</p>
+                            </div>
+                            <div className="border border-gray-200 p-4 rounded-md">
+                                <h4 className="font-medium text-gray-800 flex items-center gap-2 mb-2"><TrendingUp className="w-5 h-5" /> Top Performers (Sales)</h4>
+                                <ul className="list-disc list-inside text-sm text-gray-700">
+                                    {teamMembers.sort((a,b) => b.newCarsSold - a.newCarsSold).slice(0,3).map(member => (
+                                        <li key={member.id}>{member.name}: {member.newCarsSold} cars</li>
+                                    ))}
+                                </ul>
+                            </div>
+                        </div>
+                        {/* More detailed report sections could go here */}
+                        <div className="mt-6 text-sm text-gray-500">
+                            *Note: This report provides a summary. Click "Download Full Report" for all detailed data.
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* AI Nudging Tab (New) */}
+            {viewMode === 'overview' && activeTab === 'ai-nudge' && (
+                <div className="space-y-6">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4">AI Nudging & Automation</h2>
+
+                    <div className="bg-white rounded-xl shadow-sm p-6">
+                        <h3 className="text-xl font-semibold text-gray-900 mb-4">Recent AI-Generated Nudges</h3>
+                        {notifications.length > 0 ? (
+                            <div className="grid grid-cols-1 gap-4">
+                                {notifications.map(nudge => (
+                                    <div key={nudge.id} className={`p-4 rounded-lg border ${
+                                        nudge.priority === 'critical' ? 'border-red-300 bg-red-50' :
+                                        nudge.priority === 'high' ? 'border-orange-300 bg-orange-50' :
+                                        'border-gray-300 bg-gray-50'
+                                    }`}>
+                                        <div className="flex items-start justify-between">
+                                            <div className="flex items-center space-x-3">
+                                                {nudge.type === 'urgent' && <AlertTriangle className="w-5 h-5 text-red-600" />}
+                                                {nudge.type === 'star_risk' && <Star className="w-5 h-5 text-yellow-600" />}
+                                                {nudge.type === 'congratulations' && <Award className="w-5 h-5 text-green-600" />}
+                                                {nudge.type === 'reminder' && <Bell className="w-5 h-5 text-blue-600" />}
+                                                <div>
+                                                    <h4 className="font-semibold text-gray-900">{nudge.title}</h4>
+                                                    <p className="text-sm text-gray-600 mt-1">{nudge.message}</p>
+                                                </div>
+                                            </div>
+                                            <div className="text-right text-sm text-gray-500">
+                                                <p>{nudge.sent}</p>
+                                                {nudge.action && (
+                                                    <button className="mt-2 text-blue-600 hover:underline text-sm font-medium">
+                                                        {nudge.action}
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="text-gray-500">No recent AI nudges to display.</p>
+                        )}
+                    </div>
+
+                    <div className="bg-white rounded-xl shadow-sm p-6">
+                        <h3 className="text-xl font-semibold text-gray-900 mb-4">Send a Custom Nudge</h3>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label htmlFor="nudgeRecipient" className="block text-sm font-medium text-gray-700">Recipient</label>
+                                <select
+                                    id="nudgeRecipient"
+                                    name="nudgeRecipient"
+                                    className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                                    defaultValue="all"
+                                >
+                                    <option value="all">All Team Members</option>
+                                    {teamMembers.map(member => (
+                                        <option key={member.id} value={member.id}>{member.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div>
+                                <label htmlFor="nudgeType" className="block text-sm font-medium text-gray-700">Nudge Type</label>
+                                <select
+                                    id="nudgeType"
+                                    name="nudgeType"
+                                    className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md"
+                                >
+                                    <option>Reminder</option>
+                                    <option>Urgent Action</option>
+                                    <option>Congratulations</option>
+                                    <option>Performance Tip</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className="mt-4">
+                            <label htmlFor="nudgeMessage" className="block text-sm font-medium text-gray-700">Message</label>
+                            <textarea
+                                id="nudgeMessage"
+                                name="nudgeMessage"
+                                rows="3"
+                                className="mt-1 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+                                placeholder="Type your nudge message here..."
+                            ></textarea>
+                        </div>
+                        <div className="mt-4 flex justify-end">
+                            <button className="bg-purple-600 text-white px-5 py-2 rounded-lg hover:bg-purple-700 transition-colors flex items-center space-x-2">
+                                <Mail className="w-4 h-4" />
+                                <span>Send Nudge</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+
+            {/* Individual Employee Dashboard (Existing Code) */}
+            {viewMode === 'individual' && activeTab === 'dashboard' && currentUser && (
+                <div className="space-y-6">
+                    {/* Employee Profile Card */}
+                    <div className="bg-white rounded-xl shadow-sm p-6">
+                        <div className="flex items-center space-x-6">
+                            <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-3xl font-bold">
+                                {currentUser.name.charAt(0)}
+                            </div>
+                            <div>
+                                <h2 className="text-2xl font-bold text-gray-900">{currentUser.name}</h2>
+                                <p className="text-gray-600">{currentUser.role} at {currentUser.dealership}</p>
+                                <div className="flex items-center space-x-3 text-sm text-gray-500 mt-2">
+                                    <Mail className="w-4 h-4" /> <span>{currentUser.email}</span>
+                                    <Smartphone className="w-4 h-4" /> <span>{currentUser.phone}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="mt-6 border-t border-gray-200 pt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                                <p className="text-sm text-gray-500">Hire Date</p>
+                                <p className="font-medium text-gray-900">{currentUser.hireDate}</p>
+                            </div>
+                            <div>
+                                <p className="text-sm text-gray-500">Manager</p>
+                                <p className="font-medium text-gray-900">{currentUser.manager}</p>
+                            </div>
+                            <div>
+                                <p className="text-sm text-gray-500">Territory</p>
+                                <p className="font-medium text-gray-900">{currentUser.territory}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Key Performance Indicators */}
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                        <div className="bg-white p-6 rounded-xl shadow-sm flex items-center space-x-4">
+                            <DollarSign className="w-8 h-8 text-blue-600" />
+                            <div>
+                                <p className="text-sm text-gray-600">New Cars Sold (Current Month)</p>
+                                <p className="text-2xl font-bold text-gray-900">{currentUser.newCarsSold}</p>
+                            </div>
+                        </div>
+                        <div className="bg-white p-6 rounded-xl shadow-sm flex items-center space-x-4">
+                            <BookOpen className="w-8 h-8 text-purple-600" />
+                            <div>
+                                <p className="text-sm text-gray-600">Training Completion</p>
+                                <p className="text-2xl font-bold text-gray-900">{completionRate}%</p>
+                            </div>
+                        </div>
+                        <div className="bg-white p-6 rounded-xl shadow-sm flex items-center space-x-4">
+                            <Shield className="w-8 h-8 text-green-600" />
+                            <div>
+                                <p className="text-sm text-gray-600">Compliance Score</p>
+                                <p className={`text-2xl font-bold ${getComplianceColor(currentUser.complianceScore)}`}>{currentUser.complianceScore}%</p>
+                            </div>
+                        </div>
+                        <div className="bg-white p-6 rounded-xl shadow-sm flex items-center space-x-4">
+                            <Trophy className="w-8 h-8 text-yellow-600" />
+                            <div>
+                                <p className="text-sm text-gray-600">STAR Qualified</p>
+                                <p className={`text-2xl font-bold ${currentUser.starQualified ? 'text-green-600' : 'text-red-600'}`}>
+                                    {currentUser.starQualified ? 'Yes' : 'No'}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Certifications and Training Summary */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="bg-white p-6 rounded-xl shadow-sm">
+                            <h3 className="text-xl font-bold text-gray-900 mb-4">Certifications</h3>
+                            <div className="space-y-3">
+                                {currentUser.certifications && currentUser.certifications.map(cert => (
+                                    <div key={cert.name} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
+                                        <div className="flex items-center space-x-3">
+                                            {cert.status === 'current' && <CheckCircle className="w-5 h-5 text-green-500" />}
+                                            {cert.status === 'expiring' && <Clock className="w-5 h-5 text-orange-500" />}
+                                            {cert.status === 'pending_renewal' && <AlertCircle className="w-5 h-5 text-yellow-500" />}
+                                            {cert.status === 'overdue' && <AlertTriangle className="w-5 h-5 text-red-500" />}
+                                            {cert.status === 'expired' && <AlertTriangle className="w-5 h-5 text-red-500" />}
+                                            <span className="font-medium text-gray-800">{cert.name}</span>
+                                        </div>
+                                        <span className={`text-sm font-semibold ${
+                                            cert.status === 'current' ? 'text-green-600' :
+                                            cert.status === 'expiring' ? 'text-orange-600' :
+                                            cert.status === 'pending_renewal' ? 'text-yellow-600' :
+                                            'text-red-600'
+                                        }`}>
+                                            {cert.status === 'current' ? 'Current' :
+                                            cert.status === 'expiring' ? `Expires ${new Date(cert.expiryDate).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})}` :
+                                            cert.status === 'pending_renewal' ? `Pending Renewal (${new Date(cert.expiryDate).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})})` :
+                                            `OVERDUE (${new Date(cert.expiryDate).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})})`}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="bg-white p-6 rounded-xl shadow-sm">
+                            <h3 className="text-xl font-bold text-gray-900 mb-4">Training Modules</h3>
+                            <div className="space-y-4">
+                                {currentUser.trainingModules && currentUser.trainingModules.map(module => (
+                                    <TrainingModuleCard
+                                        key={module.id}
+                                        module={module}
+                                        onStart={handleModuleStart}
+                                        onContinue={handleModuleContinue}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Recent Nudges and Engagement */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="bg-white p-6 rounded-xl shadow-sm">
+                            <h3 className="text-xl font-bold text-gray-900 mb-4">Recent Nudges Sent</h3>
+                            <div className="space-y-3">
+                                {currentUser.recentNudges && currentUser.recentNudges.length > 0 ? (
+                                    currentUser.recentNudges.map((nudge, index) => (
+                                        <div key={index} className="flex items-start space-x-3 p-3 bg-gray-50 rounded-md border border-gray-200">
+                                            {nudge.type === 'critical' || nudge.type === 'urgent' || nudge.type === 'warning' ? (
+                                                <AlertTriangle className="w-5 h-5 text-red-500 mt-1" />
+                                            ) : (
+                                                <Bell className="w-5 h-5 text-blue-500 mt-1" />
+                                            )}
+                                            <div>
+                                                <p className="text-gray-800">{nudge.message}</p>
+                                                <p className="text-xs text-gray-500 mt-1">Sent: {nudge.sent}</p>
+                                            </div>
+                                        </div>
+                                    ))
+                                ) : (
+                                    <p className="text-gray-500 text-sm">No recent nudges for this employee.</p>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="bg-white p-6 rounded-xl shadow-sm">
+                            <h3 className="text-xl font-bold text-gray-900 mb-4">Engagement Metrics</h3>
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-gray-800 flex items-center space-x-2"><Eye className="w-5 h-5 text-gray-600" /> Nudge Open Rate:</span>
+                                    <span className="font-semibold text-gray-900">{currentUser.engagement?.nudgeOpenRate || 0}%</span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-gray-800 flex items-center space-x-2"><CheckCircle className="w-5 h-5 text-gray-600" /> Training Completion Rate:</span>
+                                    <span className="font-semibold text-gray-900">{currentUser.engagement?.trainingCompletionRate || 0}%</span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-gray-800 flex items-center space-x-2"><Clock className="w-5 h-5 text-gray-600" /> Last Login:</span>
+                                    <span className="font-semibold text-gray-900">{currentUser.engagement?.lastLogin || 'N/A'}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Individual Employee Training & Certifications (Existing Code) */}
+            {viewMode === 'individual' && activeTab === 'training' && currentUser && (
+                <div className="space-y-6">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4">Training & Certifications for {currentUser.name}</h2>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div className="bg-white p-6 rounded-xl shadow-sm">
+                            <h3 className="text-xl font-bold text-gray-900 mb-4">Current Certifications</h3>
+                            <div className="space-y-3">
+                                {currentUser.certifications && currentUser.certifications.map(cert => (
+                                    <div key={cert.name} className="flex items-center justify-between py-2 border-b border-gray-100 last:border-b-0">
+                                        <div className="flex items-center space-x-3">
+                                            {cert.status === 'current' && <CheckCircle className="w-5 h-5 text-green-500" />}
+                                            {cert.status === 'expiring' && <Clock className="w-5 h-5 text-orange-500" />}
+                                            {cert.status === 'pending_renewal' && <AlertCircle className="w-5 h-5 text-yellow-500" />}
+                                            {cert.status === 'overdue' && <AlertTriangle className="w-5 h-5 text-red-500" />}
+                                            {cert.status === 'expired' && <AlertTriangle className="w-5 h-5 text-red-500" />}
+                                            <span className="font-medium text-gray-800">{cert.name}</span>
+                                        </div>
+                                        <span className={`text-sm font-semibold ${
+                                            cert.status === 'current' ? 'text-green-600' :
+                                            cert.status === 'expiring' ? 'text-orange-600' :
+                                            cert.status === 'pending_renewal' ? 'text-yellow-600' :
+                                            'text-red-600'
+                                        }`}>
+                                            {cert.status === 'current' ? 'Current' :
+                                            cert.status === 'expiring' ? `Expires ${new Date(cert.expiryDate).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})}` :
+                                            cert.status === 'pending_renewal' ? `Pending Renewal (${new Date(cert.expiryDate).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})})` :
+                                            `OVERDUE (${new Date(cert.expiryDate).toLocaleDateString('en-US', {month: 'short', day: 'numeric'})})`}
+                                        </span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div className="bg-white p-6 rounded-xl shadow-sm">
+                            <h3 className="text-xl font-bold text-gray-900 mb-4">Assigned Training Modules</h3>
+                            <div className="space-y-4">
+                                {currentUser.trainingModules && currentUser.trainingModules.map(module => (
+                                    <TrainingModuleCard
+                                        key={module.id}
+                                        module={module}
+                                        onStart={handleModuleStart}
+                                        onContinue={handleModuleContinue}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Individual Employee STAR Rewards (Existing Code) */}
+            {viewMode === 'individual' && activeTab === 'rewards' && currentUser && (
+                <div className="space-y-6">
+                    <h2 className="text-2xl font-bold text-gray-900 mb-4">STAR Rewards for {currentUser.name}</h2>
+
+                    <div className="bg-white rounded-xl shadow-sm p-6">
+                        <div className="flex items-center space-x-4 mb-4">
+                            <Trophy className="w-10 h-10 text-yellow-500" />
+                            <div>
+                                <h3 className="text-xl font-bold text-gray-900">STAR Qualification Status:
+                                    <span className={`ml-2 ${currentUser.starQualified ? 'text-green-600' : 'text-red-600'}`}>
+                                        {currentUser.starQualified ? 'QUALIFIED' : 'NOT QUALIFIED'}
+                                    </span>
+                                </h3>
+                                <p className="text-gray-600 text-sm">
+                                    Status for {user.currentMonth} (Sales Close: {user.salesCloseDate})
+                                </p>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6 border-t pt-6 border-gray-200">
+                            <div>
+                                <p className="text-sm text-gray-500">New Cars Sold This Month</p>
+                                <p className="text-3xl font-bold text-blue-600">{currentUser.newCarsSold}</p>
+                            </div>
+                            <div>
+                                <p className="text-sm text-gray-500">Required for STAR Qualification</p>
+                                <p className="text-3xl font-bold text-gray-900">6 Cars + All Training</p>
+                            </div>
+                            <div>
+                                <p className="text-sm text-gray-500">Training Modules Completed</p>
+                                <p className="text-3xl font-bold text-purple-600">{currentUser.completedModules}/{currentUser.totalModules}</p>
+                            </div>
+                            <div>
+                                <p className="text-sm text-gray-500">Potential STAR Reward (This Month)</p>
+                                <p className="text-3xl font-bold text-green-600">${starReward.total}</p>
+                                <p className="text-sm text-gray-600">(${starReward.rate} per car)</p>
+                            </div>
+                        </div>
+
+                        {currentUser.starQualified ? (
+                            <p className="mt-6 text-green-700 bg-green-50 p-4 rounded-md flex items-center space-x-2">
+                                <CheckCircle className="w-5 h-5" />
+                                <span>Congratulations! {currentUser.name} is STAR Qualified for {user.currentMonth}.</span>
+                            </p>
+                        ) : (
+                            <div className="mt-6 text-red-700 bg-red-50 p-4 rounded-md space-y-2">
+                                <div className="flex items-center space-x-2">
+                                    <AlertTriangle className="w-5 h-5" />
+                                    <span>{currentUser.name} is NOT STAR Qualified for {user.currentMonth}.</span>
+                                </div>
+                                <ul className="list-disc list-inside text-sm">
+                                    {currentUser.newCarsSold < 6 && <li>Needs to sell {6 - currentUser.newCarsSold} more cars.</li>}
+                                    {currentUser.completedModules < currentUser.totalModules && <li>Needs to complete {currentUser.totalModules - currentUser.completedModules} training modules.</li>}
+                                    {currentUser.certificationIssues && currentUser.certificationIssues.length > 0 && <li>Resolve certification issues: {currentUser.certificationIssues.join(', ')}.</li>}
+                                </ul>
+                                <button className="mt-3 bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors">
+                                    Send Nudge to {currentUser.name}
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
         </div>
-      )}
-    </div>
-  );
+    );
 };
 
-export default AILearningApprovalWorkflow;
+export default UnifiedLearningPlatform;
