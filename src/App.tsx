@@ -26,6 +26,7 @@ const UnifiedLearningPlatform = () => {
         certifications: [],
         trainingModules: [],
         recentNudges: [],
+        certificationIssues: [],
         engagement: {
             nudgeOpenRate: 0,
             trainingCompletionRate: 0,
@@ -228,6 +229,7 @@ const UnifiedLearningPlatform = () => {
                 certifications: user.certifications,
                 trainingModules: user.trainingModules,
                 recentNudges: user.recentNudges,
+                certificationIssues: user.certificationIssues,
                 engagement: user.engagement,
             };
         }
@@ -245,6 +247,7 @@ const UnifiedLearningPlatform = () => {
             certifications: member?.certifications || [],
             trainingModules: member?.trainingModules || [],
             recentNudges: member?.recentNudges || [],
+            certificationIssues: member?.certificationIssues || [],
             engagement: member?.engagement || {
                 nudgeOpenRate: 0,
                 trainingCompletionRate: 0,
@@ -1256,7 +1259,7 @@ ${complianceAlerts.map(alert => `
                                         {(currentUser.newCarsSold || 0) < 6 && (
                                             <li>Sell {6 - (currentUser.newCarsSold || 0)} more new cars.</li>
                                         )}
-                                        {currentUser.certificationIssues && currentUser.certificationIssues.length > 0 && (
+                                        {currentUser.certificationIssues && Array.isArray(currentUser.certificationIssues) && currentUser.certificationIssues.length > 0 && (
                                             <li>Address certification issues: {currentUser.certificationIssues.join(', ')}.</li>
                                         )}
                                     </ul>
