@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Star, BookOpen, Trophy, Bell, AlertTriangle, Calendar, DollarSign, Users, CheckCircle, Clock, Mail, Smartphone, TrendingUp, Eye, Download, UserCheck, AlertCircle, Target, BarChart3, Shield, Zap, FileText, Settings, Award } from 'lucide-react';
 
 const UnifiedLearningPlatform = () => {
+    // Ensuring all potentially accessed properties are present in the base user state
     const [user] = useState({
         name: "Sarah Martinez",
         role: "Sales Manager",
@@ -10,7 +11,27 @@ const UnifiedLearningPlatform = () => {
         starQualified: true,
         currentMonth: "July 2025",
         salesCloseDate: "July 31, 2025, 11:59 PM PT",
-        daysRemaining: 3
+        daysRemaining: 3,
+        newCarsSold: 0, // Default for manager overview
+        completedModules: 0, // Default for manager overview
+        totalModules: 0, // Default for manager overview
+        complianceScore: 100, // Default for manager overview
+        lastActivity: 'N/A', // Default for manager overview
+        hireDate: 'N/A', // Default for manager overview
+        email: 'sarah.martinez@metrohyundai.com', // Example email
+        phone: '(555) 000-0000', // Example phone
+        manager: 'N/A', // Managers typically don't have a direct manager in this context
+        territory: 'All Regions', // Default for manager overview
+        ytdSales: 0, // Default for manager overview
+        avgCustomerRating: 0, // Default for manager overview
+        certifications: [], // Default for manager overview
+        trainingModules: [], // Default for manager overview
+        recentNudges: [], // Default for manager overview
+        engagement: { // Default engagement metrics for manager overview
+            nudgeOpenRate: 0,
+            trainingCompletionRate: 0,
+            lastLogin: 'N/A'
+        }
     });
 
     const [activeTab, setActiveTab] = useState('overview');
@@ -191,18 +212,54 @@ const UnifiedLearningPlatform = () => {
     };
 
     const getCurrentUser = () => {
-        if (viewMode === 'overview') return user;
+        if (viewMode === 'overview') {
+            // When in overview mode, currentUser is the manager.
+            // Ensure all properties expected in individual view are present, even if with default values.
+            return {
+                ...user,
+                // These are already in the `user` state now, but keeping them here for clarity
+                // if you ever remove them from the default user state later.
+                newCarsSold: user.newCarsSold,
+                completedModules: user.completedModules,
+                totalModules: user.totalModules,
+                complianceScore: user.complianceScore,
+                lastActivity: user.lastActivity,
+                hireDate: user.hireDate,
+                email: user.email,
+                phone: user.phone,
+                manager: user.manager,
+                territory: user.territory,
+                ytdSales: user.ytdSales,
+                avgCustomerRating: user.avgCustomerRating,
+                certifications: user.certifications,
+                trainingModules: user.trainingModules,
+                recentNudges: user.recentNudges,
+                engagement: user.engagement,
+            };
+        }
         const member = teamMembers.find(member => member.id === selectedEmployee);
         const currentTrainingModulesForSelected = member ? member.trainingModules : [];
         const completed = currentTrainingModulesForSelected.filter(m => m.status === 'completed').length;
         const total = currentTrainingModulesForSelected.length;
 
+        // Ensure all properties are consistently available when returning a team member
         return {
-            ...user,
-            ...(member || {}),
+            ...user, // Start with user base properties
+            ...(member || {}), // Override with member properties if found
             completedModules: completed,
             totalModules: total,
             starQualified: completed === total && (member ? member.newCarsSold : 0) >= 6,
+            // Ensure these properties always exist, even if the member object doesn't have them
+            certifications: member?.certifications || [],
+            trainingModules: member?.trainingModules || [],
+            recentNudges: member?.recentNudges || [],
+            engagement: member?.engagement || {
+                nudgeOpenRate: 0,
+                trainingCompletionRate: 0,
+                lastLogin: 'N/A'
+            },
+            // Explicitly ensure newCarsSold is picked from member if available, else default from user
+            newCarsSold: member?.newCarsSold !== undefined ? member.newCarsSold : user.newCarsSold,
         };
     };
 
@@ -228,15 +285,11 @@ const UnifiedLearningPlatform = () => {
                 if (member.id === employeeId) {
                     const updatedTrainingModules = member.trainingModules.map(module => {
                         if (module.id === moduleId) {
-                            // Create a new module object with consistent properties
-                            // Start with the original module properties
                             let updatedModule = { ...module, status: newStatus };
 
-                            // Conditionally add/remove properties based on status
                             if (newStatus === 'in_progress') {
                                 updatedModule.progress = newProgress;
-                                // Ensure dueDate exists if it's an in_progress module that had one
-                                if (!updatedModule.dueDate && module.dueDate) {
+                                if (!updatedModule.dueDate && module.dueDate) { // Keep original dueDate if exists
                                     updatedModule.dueDate = module.dueDate;
                                 }
                                 delete updatedModule.completedDate;
@@ -247,8 +300,7 @@ const UnifiedLearningPlatform = () => {
                                 delete updatedModule.progress;
                                 delete updatedModule.dueDate;
                             } else if (newStatus === 'not_started') {
-                                // For 'not_started', ensure dueDate is present if it was there initially
-                                if (!updatedModule.dueDate && module.dueDate) {
+                                if (!updatedModule.dueDate && module.dueDate) { // Keep original dueDate if exists
                                      updatedModule.dueDate = module.dueDate;
                                 }
                                 delete updatedModule.progress;
@@ -548,7 +600,7 @@ ${complianceAlerts.map(alert => `
                         </div>
                     )}
                 </div>
-            </div>
+            )}
 
             {/* Navigation */}
             {viewMode === 'overview' && (
@@ -1112,7 +1164,7 @@ ${complianceAlerts.map(alert => `
                 <div className="space-y-6">
                     <h2 className="text-2xl font-bold text-gray-900 mb-4">Training & Certifications for {currentUser.name}</h2>
 
-                    <div className="bg-white rounded-xl shadow-sm p-6">
+                    <div className="bg-white p-6 rounded-xl shadow-sm">
                         <h3 className="text-xl font-bold text-gray-900 mb-4">Current Certifications</h3>
                         <div className="space-y-3">
                             {currentUser.certifications && currentUser.certifications.length > 0 ? (
@@ -1170,7 +1222,7 @@ ${complianceAlerts.map(alert => `
                 <div className="space-y-6">
                     <h2 className="text-2xl font-bold text-gray-900 mb-4">STAR Rewards for {currentUser.name}</h2>
 
-                    <div className="bg-white rounded-xl shadow-sm p-6 flex items-center justify-between">
+                    <div className="bg-white p-6 rounded-xl shadow-sm flex items-center justify-between">
                         <div className="flex items-center space-x-4">
                             <Trophy className="w-12 h-12 text-yellow-600" />
                             <div>
