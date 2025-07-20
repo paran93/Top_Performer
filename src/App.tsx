@@ -123,8 +123,11 @@ const AILearningApprovalWorkflow = () => {
     },
   ]);
 
-  const getStatusColor = (status: string) => { // Added type annotation
-    const colors = {
+  // Define a type for the allowed status keys
+  type StatusKey = 'ai-generation' | 'risk-analysis' | 'sme-review' | 'legal-review' | 'dei-review' | 'lxd-review' | 'final-approval' | 'published' | 'rejected';
+  
+  const getStatusColor = (status: StatusKey) => { // Use the defined type
+    const colors: Record<StatusKey, string> = { // Add index signature or use mapped type
       'ai-generation': 'text-blue-600 bg-blue-100',
       'risk-analysis': 'text-purple-600 bg-purple-100',
       'sme-review': 'text-yellow-600 bg-yellow-100',
@@ -138,8 +141,11 @@ const AILearningApprovalWorkflow = () => {
     return colors[status] || 'text-gray-600 bg-gray-100';
   };
 
-  const getRiskColor = (risk: string) => { // Added type annotation
-    const colors = {
+  // Define a type for the allowed risk keys
+  type RiskKey = 'low' | 'medium' | 'high';
+
+  const getRiskColor = (risk: RiskKey) => { // Use the defined type
+    const colors: Record<RiskKey, string> = { // Add index signature or use mapped type
       'low': 'text-green-600 bg-green-100',
       'medium': 'text-yellow-600 bg-yellow-100',
       'high': 'text-red-600 bg-red-100'
